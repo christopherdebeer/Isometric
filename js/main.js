@@ -106,7 +106,7 @@ $(document).ready(function(){
                     if(cell !== 0){
                         var pos = new THREE.Vector3(j, i, k);
                         pos.multiplyScalar(cubeSize);
-                        cubes.push(addCube(cubeSize, pos, colours[cell], false));
+                        cubes.push(addCube(cubeSize, pos, colours[cell], true));
                     }
                 }
             }
