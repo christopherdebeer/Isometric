@@ -6,7 +6,7 @@ $(document).ready(function(){
     var camera, scene, renderer,
         geometry, material,
         cubes = [],
-        cameraOffset = [7, 5, 7];
+        cameraOffset = [4, 6, 4];
 
     var mouse, projector, ray, floor;
 
@@ -199,6 +199,7 @@ $(document).ready(function(){
         var tmp = new THREE.Vector3(c[0], c[1], c[2]);
         tmp.addSelf(player.position);
         camera.position = tmp;
+        camera.lookAt(player.position);
     };
 
     var bindInputs = function(){
@@ -287,8 +288,6 @@ $(document).ready(function(){
 
         camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100);
         scene.add(camera);
-        //camera.rotation.x = -0.4;
-        camera.rotation.y = pi / 4;
 
         addLight(170, 330, -160);
         addLight(-170, 330, 160);
@@ -300,8 +299,6 @@ $(document).ready(function(){
 
         createWorld();
         
-        
-
         // addPlane();
         playercube = addCube(cubeSize, player.position, 0x0000ff, true);
 
