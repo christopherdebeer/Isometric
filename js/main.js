@@ -9,6 +9,17 @@ $(document).ready(function(){
         cameraOffset = [7, 5, 7];
 
     var mouse, projector, ray, floor;
+
+    var fps,
+        oldTime = +new Date(),
+        tick = 1;
+
+    var DOM = {
+        fps: $("#fps"),
+        absorbed: $("#absorbed"),
+        game: $("#game")
+
+    };
     
     var mousepos = {
         x : 0,
@@ -23,13 +34,14 @@ $(document).ready(function(){
         cubeSize = 1,
         fov = 70,
 
-        numAnimals = 5;
+        numAnimals = 10,
+        absorbed = 0;
 
     var gravity = 0;//0.00981;
 
     var paused = false,
-        flying = true,
-        tick = 1;
+        flying = false;
+        
 
     var colours = [
         null,
@@ -43,40 +55,54 @@ $(document).ready(function(){
     var player = new Player();
 
     var createWorld = function(){
-        // for (var i = 0; i < numLayers; i++) {
-        //     world.push([]);
-        //     for (var j = 0; j < worldSize; j++) {
-        //         world[i].push([]);
-        //         for (var k = 0; k < worldSize; k++) {
-        //             if(i === 0){
-        //                 world[i][j].push(i + 1);
-        //             }
-        //             else if(i === 1){
-        //                 world[i][j].push(randbool(0.5) ? 3 : 1);
-        //             }
-        //             else if(i === 2){
-        //                 world[i][j].push(randbool(0.5) ? 0 : 1);
-        //             }
-        //             else {
-        //                 world[i][j].push(0);
-        //             }
-        //         }
-        //     }
-        // }
         $.getJSON('world.json', function(data){
             world = data.world;
             dimensions.y = world.length;
-            renderWorld();
+            parseWorld();
+            for (var i = 0; i < numAnimals; i++) {
+                var a = new Animal(dimensions);
+                animalsdata.push(a);
+                animals.push(addCube(a.height, a.position, a.colour, true));
+            }
         });
+    };
+
+    var parseWorld = function(){
+        var i, j, k,
+            layer, line, cell;
+        
+        for (i = 0; i < dimensions.y; i++) {
+            layer = world[i];
+
+            for (j = 0; j < layer.length; j++) {
+                line = layer[j].split('');
+
+                for (k = 0; k < line.length; k++) {
+                    cell = +line[k];
+
+                    if(cell !== 0){
+                        var pos = new THREE.Vector3(j, i, k);
+                        pos.multiplyScalar(cubeSize);
+                        cubes.push(addCube(cubeSize, pos, colours[cell], true));
+                    }
+                }
+            }
+
+        }
+
+        dimensions.x = j;
+        dimensions.z = k;
+
+        //console.log(dimensions);
+
+        player.position.addSelf(new THREE.Vector3(j / 2 - 1, 1, k / 2 - 1));
+        playercube.position = player.position;
+        moveCamera();
     };
 
     var rand = function(scale){
         scale = scale || 1;
         return Math.random() * scale;
-    };
-
-    var randint = function(low, high){
-        return Math.floor(Math.random() + 1) * x;
     };
 
     var randbool = function(x){
@@ -88,70 +114,51 @@ $(document).ready(function(){
         return '#' + Math.floor(Math.random() * 16777215).toString(16);
     };
 
-    var renderWorld = function(){
-        var i, j, k,
-            layer, line, cell;
-        
-        for (i = 0; i < dimensions.y; i++) {
-            layer = world[i];
-            dimensions.x = layer.length;
-
-            for (j = 0; j < dimensions.x; j++) {
-                line = layer[j].split('');
-                dimensions.z = line.length;
-
-                for (k = 0; k < dimensions.z; k++) {
-                    cell = +line[k];
-
-                    if(cell !== 0){
-                        var pos = new THREE.Vector3(j, i, k);
-                        pos.multiplyScalar(cubeSize);
-                        cubes.push(addCube(cubeSize, pos, colours[cell], true));
-                    }
-                }
-            }
-        }
-        //console.log(dimensions);
-        player.position.addSelf(new THREE.Vector3(j / 2 - 1, 1, k / 2 - 1));
-        playercube.position = player.position;
-        moveCamera();
-    };
-
     var render = function(){
         if (paused) { return; }
 
         renderer.render(scene, camera);
     };
 
-    var logic = function(){
+    var logic = function(time){
         if (paused) { return; }
 
-        // if (player.b > 0){
-        //     playercube.position[player.axis] += 0.1 * player.direction;
-        //     player.b--;
-        // }
-        playercube.position = player.position;
+        tick = tick > 100 ? 1 : tick + 1;
+        fps = Math.round(1000 / (time - oldTime));
+        oldTime = time;
+
+        if (tick % 20 === 0){
+            // if (player.b > 0){
+            //     playercube.position[player.axis] += 0.1 * player.direction;
+            //     player.b--;
+            // }
+            playercube.position = player.position;
 
 
-        for (var i = 0; i < animals.length; i++) {
-            var axis = randbool() ? 'z' : 'x',
-                dir = randbool() ? 1 : -1,
-                animal = animals[i];
-            updatePos(animal, axis, dir);
-            updatePos(animal, 'y', -1);
-            var p = player.position, a = animal.position;
-            if (p.x === a.x && p.y === a.y && p.z === a.z){
-                //console.log("absorb");
-                animals.splice(i);
-                animalsdata.splice(i);
-                scene.remove(animals[i]);
+            for (var i = 0; i < animals.length; i++){
+                var axis = randbool() ? 'z' : 'x',
+                    dir = randbool() ? 1 : -1,
+                    animal = animals[i];
+                updatePos(animal, axis, dir);
+                updatePos(animal, 'y', -1);
+                var p = player.position, a = animal.position;
+                if (p.x === a.x && p.y === a.y && p.z === a.z){
+                    console.log("absorb");
+                    //animals.splice(i);
+                    //animalsdata.splice(i);
+                    //scene.remove(animals[i]);
+                    absorbed++;
+                }
             }
 
-            //animals[i].position[axis] += dir * 1;//addSelf(animalsdata[i].speed);
-        }
+            //Apply gravity
+            if(!flying){
+                updatePos(player, 'y', -1);
+            }
 
-        //Some falling stuff
-        updatePos(player, 'y', -1);
+            DOM.fps.text(fps + " FPS");
+            GUI.setAbsorbed();
+        }
     };
 
     var canMove = function(thing, axis, direction){
@@ -293,11 +300,7 @@ $(document).ready(function(){
 
         createWorld();
         
-        for (var i = 0; i < numAnimals; i++) {
-            var a = new Animal();
-            animalsdata.push(a);
-            animals.push(addCube(a.height, a.position, a.colour, true));
-        }
+        
 
         // addPlane();
         playercube = addCube(cubeSize, player.position, 0x0000ff, true);
@@ -307,22 +310,30 @@ $(document).ready(function(){
         //ray = new THREE.Ray( camera.position );
 
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        var border = 100;
+        renderer.setSize(window.innerWidth - border, window.innerHeight - border);
         renderer.shadowMapEnabled = true;
 
-        $('body').append(renderer.domElement);
+        DOM.game.append(renderer.domElement);
+        GUI.setAbsorbed();
 
         $('canvas').css({background : 'skyblue'});
 
         bindInputs();
     };
 
-    var animate = function(){
-        requestAnimationFrame(animate);
+    var run = function(time){
+        requestAnimationFrame(run);
         render();
+        logic(time);
     };
 
-    
+    var GUI = {
+        setAbsorbed: function(){
+            var plural = absorbed === 1 ? '' : 's';
+            DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
+        }
+    };
 
 
 
@@ -357,7 +368,7 @@ $(document).ready(function(){
     };
 
     var addLight = function(x, y, z){
-        var light = new THREE.SpotLight();
+        var light = new THREE.DirectionalLight(0xffffff, 0.5);
         light.position.set(x, y, z);
         light.castShadow = true;
         scene.add(light);
@@ -365,6 +376,5 @@ $(document).ready(function(){
     };
 
     init();
-    animate();
-    var foo = window.setInterval(logic, 200);
+    run();
 });

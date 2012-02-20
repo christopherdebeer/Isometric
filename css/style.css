@@ -70,6 +70,10 @@ table {
 }
 */
 
+* {
+	-webkit-box-sizing: border-box;
+}
+
 html, body{
 	height: 100%;
 	width: 100%;
@@ -77,12 +81,16 @@ html, body{
 
 body{
 	background: ;
-	font-family: ;
+	font-family: sans-serif;
 }
 
 .container{
-	width: 1000px;
 	margin: 0 auto;
+}
+
+#ui{
+	height: 90px;
+	padding: 20px;
 }
 
 .round{

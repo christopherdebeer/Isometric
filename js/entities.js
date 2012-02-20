@@ -17,8 +17,12 @@ var Player = function(){
     this.b = 0;
 };
 
-var Animal = function(){
-    this.position = new THREE.Vector3(10, 1, 10);
+var Animal = function(d){
+    this.position = new THREE.Vector3(
+        THREE.Math.randInt(2, d.x - 3),
+        1,
+        THREE.Math.randInt(2, d.z - 3)
+    );
     this.colour = 0xff0000;//randColour();
     this.height = 1;
     this.width = 5;
