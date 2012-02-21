@@ -93,6 +93,13 @@ body{
 	padding: 20px;
 }
 
+#ui div{
+	float: left;
+	margin: 0 20px 0 0;
+	border-right: 1px solid black;
+	padding: 5px;
+}
+
 .round{
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 1opx;
