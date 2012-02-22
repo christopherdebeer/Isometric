@@ -38,10 +38,10 @@ $(document).ready(function(){
         0x0D4FBF, //water blue
         0x5C3C06 //mud brown
     ],
-        animals = [],
+        animalscubes = [],
         animalsdata = [];
 
-    var player = new Player();
+    var playerdata = new Player();
 
     var createWorld = function(){
         $.getJSON('world.json', function(data){
@@ -51,7 +51,7 @@ $(document).ready(function(){
             for (var i = 0; i < numAnimals; i++) {
                 var a = new Animal(dimensions);
                 animalsdata.push(a);
-                animals.push(addCube(a.height, a.position, a.colour, true));
+                animalscubes.push(addCube(a.height, a.position, a.colour, true));
             }
         });
     };
@@ -84,10 +84,10 @@ $(document).ready(function(){
 
         //console.log(dimensions);
 
-        player.arrayPosition.addSelf(new THREE.Vector3(j / 2 - 1, 1, k / 2 - 1));
-        player.position.addSelf(player.arrayPosition);
-        player.position.multiplyScalar(cubeSize);
-        playercube.position = player.position;
+        playerdata.arrayPosition.addSelf(new THREE.Vector3(j / 2 - 1, 1, k / 2 - 1));
+        playerdata.position.addSelf(playerdata.arrayPosition);
+        playerdata.position.multiplyScalar(cubeSize);
+        playercube.position = playerdata.position;
         moveCamera();
     };
 
@@ -120,46 +120,46 @@ $(document).ready(function(){
         fps = Math.round(1000 / (time - oldTime));
         oldTime = time;
 
-        var numEntities = animals.length + 1;
+        var numEntities = animalscubes.length + 1;
         for (i = 0; i < numEntities; i++) {
             var entity, data;
             if (i === numEntities - 1){
                 entity = playercube;
-                info = player;
+                data = playerdata;
 
                 if(!flying){
-                    updatePos(player, 'y', -1);
+                    updatePos(playerdata, 'y', -1);
                 }
             } else {
-                entity = animals[i];
-                info = animalsdata[i];
+                entity = animalscubes[i];
+                data = animalsdata[i];
 
                 var axis = randbool() ? 'z' : 'x',
                     dir = randbool() ? 1 : -1;
 
-                updatePos(info, axis, dir);
-                updatePos(info, 'y', -1);
+                updatePos(data, axis, dir);
+                updatePos(data, 'y', -1);
 
-                var p = player.arrayPosition,
-                    a = info.arrayPosition;
+                var p = playerdata.arrayPosition,
+                    a = data.arrayPosition;
                 if (p.x === a.x && p.y === a.y && p.z === a.z){
                     console.log("absorb");
-                    //animals.splice(i);
+                    //animalscubes.splice(i);
                     //animalsdata.splice(i);
-                    //scene.remove(animals[i]);
+                    //scene.remove(animalscubes[i]);
                     absorbed++;
                 }
             }
 
-            if (info.distanceToMove > 0){
-                info.position[info.axis] += info.animationIncrement * info.direction;
-                info.distanceToMove -= info.animationIncrement;
+            if (data.distanceToMove > 0){
+                data.position[data.axis] += data.animationIncrement * data.direction;
+                data.distanceToMove -= data.animationIncrement;
             }
-            if (info.distanceToMove === 0){
-                info.isAnimating = false;
+            if (data.distanceToMove === 0){
+                data.isAnimating = false;
             }
 
-            entity.position = info.position;
+            entity.position = data.position;
         }
         moveCamera();
 
@@ -189,7 +189,7 @@ $(document).ready(function(){
         ){
             return false;
         }
-        
+
         //Check whether the block is empty
         if(world[q.y][q.x].charAt(q.z) === '0'){
             return true;
@@ -213,38 +213,38 @@ $(document).ready(function(){
     var moveCamera = function(){
         var c = cameraOffset;
         var tmp = new THREE.Vector3(c[0], c[1], c[2]);
-        tmp.addSelf(player.position);
+        tmp.addSelf(playerdata.position);
         camera.position = tmp;
-        camera.lookAt(player.position);
+        camera.lookAt(playerdata.position);
     };
 
     var bindInputs = function(){
         key('w', function(){
-            updatePos(player, 'z', -1);
+            updatePos(playerdata, 'z', -1);
         });
 
         key('a', function(){
-            updatePos(player, 'x', -1);
+            updatePos(playerdata, 'x', -1);
         });
 
         key('s', function(){
-            updatePos(player, 'z', 1);
+            updatePos(playerdata, 'z', 1);
         });
 
         key('d', function(){
-            updatePos(player, 'x', 1);
+            updatePos(playerdata, 'x', 1);
         });
 
         key('space', function(){
-            var p = player.arrayPosition;
-            //Check if there's a block underneath before letting the player jump
+            var p = playerdata.arrayPosition;
+            //Check if there's a block underneath before letting the playerdata jump
             if(flying || (p.y === 0 || world[p.y - 1][p.x].charAt(p.z) !== '0')){
-                updatePos(player, 'y', 1);
+                updatePos(playerdata, 'y', 1);
             }
         });
 
         key('\\', function(){
-            updatePos(player, 'y', -1);
+            updatePos(playerdata, 'y', -1);
         });
 
         key('p', function(){ paused = !paused; });
@@ -260,9 +260,9 @@ $(document).ready(function(){
         //     intersects = ray.intersectObject(floor);
         //     console.log(intersects);
         //     // var pos = new THREE.Vector3(
-        //     //     (player.position.x + 10) * Math.cos(player.rotation.angle.x),
-        //     //     player.position.y,
-        //     //     (player.position.z + 10) * Math.sin(player.rotation.angle.x)
+        //     //     (playerdata.position.x + 10) * Math.cos(playerdata.rotation.angle.x),
+        //     //     playerdata.position.y,
+        //     //     (playerdata.position.z + 10) * Math.sin(playerdata.rotation.angle.x)
         //     // );
         //     addCube(cubeSize, intersects.point, 0x0000ff, cubes, false);
         // });
@@ -274,8 +274,8 @@ $(document).ready(function(){
         //         y = e.clientY,
         //         deltax = mousepos.x - x,
         //         deltay = mousepos.y - y;
-        //     player.rotation.speed.x = deltax * scaling;
-        //     player.rotation.speed.y = deltay * scaling;
+        //     playerdata.rotation.speed.x = deltax * scaling;
+        //     playerdata.rotation.speed.y = deltay * scaling;
 
         //     //save previous values for next time
         //     mousepos.x = x;
@@ -299,7 +299,7 @@ $(document).ready(function(){
 
         createWorld();
         
-        playercube = addCube(cubeSize, player.position, 0x0000ff, true);
+        playercube = addCube(cubeSize, playerdata.position, 0x0000ff, true);
 
         //mouse = new THREE.Vector3( 0, 0, 1 );
         //projector = new THREE.Projector();
