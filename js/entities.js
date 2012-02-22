@@ -7,7 +7,7 @@ var world = [],
         playercube,
         //worldSize = 20,
         //numLayers = 5,
-        cubeSize = 20,
+        cubeSize = 10,
         fov = 70,
 
         numAnimals = 10,
@@ -25,7 +25,7 @@ var Player = function(){
     //this.friction = new THREE.Vector3();
     //this.step = 0.1;
     //this.maxSpeed = 0.2;
-    this.animationIncrement = 1;
+    this.animationIncrement = cubeSize / 10;
     this.isAnimating = false;
     this.distanceToMove = 0;
 };
@@ -45,8 +45,8 @@ var Animal = function(d){
     this.height = cubeSize;
     this.width = cubeSize;
 
-    this.animationIncrement = 1;
-    this.isAnimating = true;
+    this.animationIncrement = cubeSize / 10;
+    this.isAnimating = false;
     this.distanceToMove = 0;
     // this.angle = Math.random() * tau;
     // console.log(this.angle);

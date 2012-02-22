@@ -120,28 +120,28 @@ $(document).ready(function(){
         fps = Math.round(1000 / (time - oldTime));
         oldTime = time;
 
-        if (player.distanceToMove > 0){
-            //console.log(player.distanceToMove);
-            player.position[player.axis] += player.animationIncrement * player.direction;
-            //playercube.position[player.axis] += 0.1 * player.direction;
-            player.distanceToMove -= player.animationIncrement;
-        }
-        if (player.distanceToMove === 0){
-            player.isAnimating = false;
-            //console.log(player.position);
-        }
+        var numEntities = animals.length + 1;
+        for (i = 0; i < numEntities; i++) {
+            var entity, data;
+            if (i === numEntities - 1){
+                entity = playercube;
+                info = player;
 
-        if (tick % 20 === 0){
+                if(!flying){
+                    updatePos(player, 'y', -1);
+                }
+            } else {
+                entity = animals[i];
+                info = animalsdata[i];
 
-            for (i = 0; i < animals.length; i++){
                 var axis = randbool() ? 'z' : 'x',
-                    dir = randbool() ? 1 : -1,
-                    animal = animalsdata[i];
+                    dir = randbool() ? 1 : -1;
 
-                updatePos(animal, axis, dir);
-                updatePos(animal, 'y', -1);
+                updatePos(info, axis, dir);
+                updatePos(info, 'y', -1);
 
-                var p = player.arrayPosition, a = animal.arrayPosition;
+                var p = player.arrayPosition,
+                    a = info.arrayPosition;
                 if (p.x === a.x && p.y === a.y && p.z === a.z){
                     console.log("absorb");
                     //animals.splice(i);
@@ -149,27 +149,25 @@ $(document).ready(function(){
                     //scene.remove(animals[i]);
                     absorbed++;
                 }
-
-                if (animal.distanceToMove === 0){
-                    animal.isAnimating = false;
-                    //console.log(player.position);
-                }
             }
 
-            //Apply gravity
-            if(!flying){
-                updatePos(player, 'y', -1);
+            if (info.distanceToMove > 0){
+                info.position[info.axis] += info.animationIncrement * info.direction;
+                info.distanceToMove -= info.animationIncrement;
+            }
+            if (info.distanceToMove === 0){
+                info.isAnimating = false;
             }
 
+            entity.position = info.position;
+        }
+        moveCamera();
+
+        if (tick % 20 === 0){
             DOM.fps.text(fps + " FPS");
             GUI.setAbsorbed();
         }
-
-        for (i = 0; i < animals.length; i++){
-            animals[i].position = animalsdata[i].position;
-        }
-        playercube.position = player.position;
-        moveCamera();
+        
     };
 
     var canMove = function(thing, axis, direction){
@@ -184,15 +182,14 @@ $(document).ready(function(){
         
 
         //Check that the cube is within the bounds of the world
-        if (q.x < 0 || q.x >= dimensions.x){
+        if (
+            q.x < 0 || q.x >= dimensions.x ||
+            q.z < 0 || q.z >= dimensions.z ||
+            q.y < 0 || q.y >= dimensions.y
+        ){
             return false;
         }
-        if (q.z < 0 || q.z >= dimensions.z){
-            return false;
-        }
-        if (q.y < 0 || q.y >= dimensions.y){
-            return false;
-        }
+        
         //Check whether the block is empty
         if(world[q.y][q.x].charAt(q.z) === '0'){
             return true;
@@ -289,11 +286,11 @@ $(document).ready(function(){
     var init = function(){
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100 * cubeSize);
         scene.add(camera);
 
-        addLight(170, 330, -160);
-        addLight(-170, 330, 160);
+        addLight(17 * cubeSize, 33 * cubeSize, -16 * cubeSize);
+        addLight(-17 * cubeSize, 33 * cubeSize, 16 * cubeSize);
 
         // var fog = new THREE.Fog();
         // fog.color = 0x444444;
@@ -302,7 +299,6 @@ $(document).ready(function(){
 
         createWorld();
         
-        // addPlane();
         playercube = addCube(cubeSize, player.position, 0x0000ff, true);
 
         //mouse = new THREE.Vector3( 0, 0, 1 );
@@ -334,22 +330,6 @@ $(document).ready(function(){
             DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
         }
     };
-
-
-
-    // var applyFriction = function(thing){
-    //     //thing.friction = thing.accel.multiplyScalar(0.1);
-    //     thing.speed.multiplyScalar(0.9);
-    // };
-
-    // var jump = function(thing, dir){
-    //     if (flying){
-    //         //player.speed.y = dir * 0.04;
-    //         thing.position.y += dir;
-    //     } else {
-            
-    //     }
-    // };
 
     var addCube = function(size, position, colour, shadows){
         geometry = new THREE.CubeGeometry(size, size, size);
