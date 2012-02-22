@@ -88,15 +88,19 @@ body{
 	margin: 0 auto;
 }
 
+.container > div{
+	float: left;
+}
+
 #ui{
-	height: 90px;
+	width: 280px;
 	padding: 20px;
+	border: 1px solid black;
 }
 
 #ui div{
-	float: left;
 	margin: 0 20px 0 0;
-	border-right: 1px solid black;
+	border-bottom: 1px solid black;
 	padding: 5px;
 }
 

@@ -6,9 +6,9 @@ $(document).ready(function(){
     var camera, scene, renderer,
         geometry, material,
         cubes = [],
-        cameraOffset = [4 * cubeSize, 6 * cubeSize, 4 * cubeSize];
+        cameraOffset = new THREE.Vector3(4, 6, 7).multiplyScalar(cubeSize);
 
-    var mouse, projector, ray, floor;
+    //var mouse, projector, ray, floor;
 
     var fps,
         oldTime = +new Date(),
@@ -20,29 +20,35 @@ $(document).ready(function(){
         game: $("#game")
 
     };
-    
-    var mousepos = {
-        x : 0,
-        y : 0
+
+    var GUI = {
+        setAbsorbed: function(){
+            var plural = absorbed === 1 ? '' : 's';
+            DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
+        }
     };
     
-    var gravity = 0;//0.00981;
+    // var mousepos = {
+    //     x : 0,
+    //     y : 0
+    // };
+    
+    //var gravity = 0.00981;
 
     var paused = false,
         flying = false;
         
-
     var colours = [
         null,
         0x333333, //grey
         0x0CA80C, //grass green
         0x0D4FBF, //water blue
         0x5C3C06 //mud brown
-    ],
-        animalscubes = [],
-        animalsdata = [];
+    ];
 
-    var playerdata,
+    var animalscubes = [],
+        animalsdata = [],
+        playerdata,
         goaldata;
 
     var createWorld = function(){
@@ -52,8 +58,8 @@ $(document).ready(function(){
             cubes = [];
 
             world = data.world;
-            var s = data.startPosition;
-            var g = data.goalPosition;
+            var s = data.startPosition,
+                g = data.goalPosition;
 
             dimensions.y = world.length;
             parseWorld();
@@ -157,12 +163,12 @@ $(document).ready(function(){
                 //the method appears. Couldn't find it in Chrome.
                 if (playerdata.arrayPosition.distanceTo(data.arrayPosition) === 0){
                     console.log("absorb");
+                    scene.remove(entity);
                     //animalscubes.splice(i);
                     //animalsdata.splice(i);
                     absorbed++;
                 }
             }
-
             if (data.distanceToMove > 0){
                 data.position[data.axis] += data.animationIncrement * data.direction;
                 data.distanceToMove -= data.animationIncrement;
@@ -182,7 +188,7 @@ $(document).ready(function(){
                 alert("You win the current level");
                 currentLevel++;
                 clearScene();
-                makeNewLevel();
+                createWorld();
                 return;
             } else {
                 alert("You've finished the game");
@@ -236,14 +242,13 @@ $(document).ready(function(){
     };
 
     var moveCamera = function(){
-        var c = cameraOffset;
-        var tmp = new THREE.Vector3(c[0], c[1], c[2]);
-        tmp.addSelf(playerdata.position);
-        camera.position = tmp;
+        camera.position = cameraOffset.clone().addSelf(playerdata.position);
         camera.lookAt(playerdata.position);
     };
 
     var bindInputs = function(){
+        //Try and bind these keys in a loop, lots of duplication here
+        //Couldn't get it to work previously.
         key('w', function(){
             updatePos(playerdata, 'z', -1);
         });
@@ -258,10 +263,6 @@ $(document).ready(function(){
 
         key('d', function(){
             updatePos(playerdata, 'x', 1);
-        });
-
-        key('r', function(){
-            scene.remove(playercube);
         });
 
         key('space', function(){
@@ -312,12 +313,6 @@ $(document).ready(function(){
         // });
     };
 
-    var makeNewLevel = function(){
-        createWorld();
-
-        
-    };
-
     var init = function(){
         scene = new THREE.Scene();
 
@@ -332,15 +327,14 @@ $(document).ready(function(){
         // fog.near = 40;
         // scene.fog = fog;
 
-        makeNewLevel();
+        createWorld();
 
         //mouse = new THREE.Vector3( 0, 0, 1 );
         //projector = new THREE.Projector();
         //ray = new THREE.Ray( camera.position );
 
         renderer = new THREE.WebGLRenderer();
-        var border = 100;
-        renderer.setSize(window.innerWidth - border, window.innerHeight - border);
+        renderer.setSize(window.innerWidth - 300, window.innerHeight - 50);
         renderer.shadowMapEnabled = true;
 
         DOM.game.append(renderer.domElement);
@@ -355,13 +349,6 @@ $(document).ready(function(){
         requestAnimationFrame(run);
         render();
         logic(time);
-    };
-
-    var GUI = {
-        setAbsorbed: function(){
-            var plural = absorbed === 1 ? '' : 's';
-            DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
-        }
     };
 
     var addCube = function(size, position, colour, shadows){
