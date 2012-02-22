@@ -45,7 +45,7 @@ $(document).ready(function(){
     var playerdata = new Player();
 
     var createWorld = function(){
-        $.getJSON('world.json', function(data){
+        $.getJSON('worlds/' + currentLevel + '.json', function(data){
             world = data.world;
             dimensions.y = world.length;
             parseWorld();
@@ -225,7 +225,7 @@ $(document).ready(function(){
 
         key('space', function(){
             var p = playerdata.arrayPosition;
-            //Check if there's a block underneath before letting the playerdata jump
+            //Check if there's a block underneath before letting the player jump
             if(flying || (p.y === 0 || world[p.y - 1][p.x].charAt(p.z) !== '0')){
                 updatePos(playerdata, 'y', 1);
             }

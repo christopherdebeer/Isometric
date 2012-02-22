@@ -1,17 +1,18 @@
 var pi = Math.PI,
-        tau = 2 * pi,
-        halfpi = pi / 2;
+    tau = 2 * pi,
+    halfpi = pi / 2;
 
 var world = [],
-        dimensions = {},
-        playercube,
-        //worldSize = 20,
-        //numLayers = 5,
-        cubeSize = 10,
-        fov = 70,
+    currentLevel = 2,
+    dimensions = {},
+    playercube,
+    //worldSize = 20,
+    //numLayers = 5,
+    cubeSize = 10,
+    fov = 70,
 
-        numAnimals = 10,
-        absorbed = 0;
+    numAnimals = 10,
+    absorbed = 0;
 
 var rand, randbool, randColour;
 rand = function(scale){
