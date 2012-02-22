@@ -3,9 +3,11 @@ var pi = Math.PI,
     halfpi = pi / 2;
 
 var world = [],
-    currentLevel = 2,
+    currentLevel = 3,
+    numLevels = 3,
     dimensions = {},
     playercube,
+    goalcube,
     //worldSize = 20,
     //numLayers = 5,
     cubeSize = 10,
@@ -29,9 +31,11 @@ randColour = function(){
     return Math.floor(Math.random() * 16777215);
 };
 
-var Player = function(){
+var Player = function(p){
+    this.arrayPosition = new THREE.Vector3(p.x, p.y, p.z);
     this.position = new THREE.Vector3();
-    this.arrayPosition = new THREE.Vector3();
+    this.position.addSelf(this.arrayPosition);
+    this.position.multiplyScalar(cubeSize);
     // this.speed = new THREE.Vector3();
     // this.rotation = {
     //     speed : new THREE.Vector3(),
@@ -44,6 +48,8 @@ var Player = function(){
     this.animationIncrement = cubeSize / 10;
     this.isAnimating = false;
     this.distanceToMove = 0;
+
+    this.colour = 0x0000ff;
 };
 
 var Animal = function(d){
@@ -72,4 +78,14 @@ var Animal = function(d){
     //     (Math.random() - 0.5) * 0.01
     // );
     // this.accel = -1;
+};
+
+var Goal = function(p){
+    this.arrayPosition = new THREE.Vector3(p.x, p.y, p.z);
+    this.position = new THREE.Vector3();
+    this.position.addSelf(this.arrayPosition);
+    this.position.multiplyScalar(cubeSize);
+    this.height = cubeSize;
+    this.colour = 0xD4AF37; //gold
+
 };

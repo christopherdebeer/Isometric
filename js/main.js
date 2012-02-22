@@ -42,19 +42,53 @@ $(document).ready(function(){
         animalscubes = [],
         animalsdata = [];
 
-    var playerdata = new Player();
+    var playerdata,
+        goaldata;
 
     var createWorld = function(){
         $.getJSON('worlds/' + currentLevel + '.json', function(data){
+            animalscubes = [];
+            animalsdata = [];
+            cubes = [];
+
             world = data.world;
+            var s = data.startPosition;
+            var g = data.goalPosition;
+
             dimensions.y = world.length;
             parseWorld();
+
+            goaldata = new Goal(g);
+            playerdata = new Player(s);
+
+            playercube = addCube(cubeSize, playerdata.position, playerdata.colour, true);
+            goalcube = addCube(cubeSize, goaldata.position, goaldata.colour, true);
+            
+            playercube.position = playerdata.position;
+            goalcube.position = goaldata.position;
+
+            moveCamera();
+
             for (var i = 0; i < numAnimals; i++) {
                 var a = new Animal(dimensions);
                 animalsdata.push(a);
                 animalscubes.push(addCube(a.height, a.position, a.colour, true));
             }
         });
+    };
+
+    var clearScene = function(){
+        var i;
+        for (i = 0; i < cubes.length; i++) {
+            var cube = cubes[i];
+            scene.remove(cube);
+        }
+        for (i = 0; i < animalscubes.length; i++) {
+            var animal = animalscubes[i];
+            scene.remove(animal);
+        }
+        scene.remove(playercube);
+        scene.remove(goalcube);
     };
 
     var parseWorld = function(){
@@ -82,17 +116,7 @@ $(document).ready(function(){
 
         dimensions.x = j;
         dimensions.z = k;
-
-        //console.log(dimensions);
-
-        playerdata.arrayPosition.addSelf(new THREE.Vector3(j / 2 - 1, 1, k / 2 - 1));
-        playerdata.position.addSelf(playerdata.arrayPosition);
-        playerdata.position.multiplyScalar(cubeSize);
-        playercube.position = playerdata.position;
-        moveCamera();
     };
-
-    
 
     var render = function(){
         if (paused) { return; }
@@ -129,13 +153,12 @@ $(document).ready(function(){
                 updatePos(data, axis, dir);
                 updatePos(data, 'y', -1);
 
-                var p = playerdata.arrayPosition,
-                    a = data.arrayPosition;
-                if (p.x === a.x && p.y === a.y && p.z === a.z){
+                //This should be replaced with vector1.equals(vector2) if
+                //the method appears. Couldn't find it in Chrome.
+                if (playerdata.arrayPosition.distanceTo(data.arrayPosition) === 0){
                     console.log("absorb");
                     //animalscubes.splice(i);
                     //animalsdata.splice(i);
-                    //scene.remove(animalscubes[i]);
                     absorbed++;
                 }
             }
@@ -151,6 +174,20 @@ $(document).ready(function(){
             entity.position = data.position;
         }
         moveCamera();
+
+        //This should be replaced with vector1.equals(vector2) if
+        //the method appears. Couldn't find it in Chrome.
+        if (playerdata.arrayPosition.distanceTo(goaldata.arrayPosition) === 0){
+            if (currentLevel < numLevels){
+                alert("You win the current level");
+                currentLevel++;
+                clearScene();
+                makeNewLevel();
+                return;
+            } else {
+                alert("You've finished the game");
+            }
+        }
 
         if (tick % 20 === 0){
             DOM.fps.text(fps + " FPS");
@@ -223,6 +260,10 @@ $(document).ready(function(){
             updatePos(playerdata, 'x', 1);
         });
 
+        key('r', function(){
+            scene.remove(playercube);
+        });
+
         key('space', function(){
             var p = playerdata.arrayPosition;
             //Check if there's a block underneath before letting the player jump
@@ -271,6 +312,12 @@ $(document).ready(function(){
         // });
     };
 
+    var makeNewLevel = function(){
+        createWorld();
+
+        
+    };
+
     var init = function(){
         scene = new THREE.Scene();
 
@@ -285,9 +332,7 @@ $(document).ready(function(){
         // fog.near = 40;
         // scene.fog = fog;
 
-        createWorld();
-        
-        playercube = addCube(cubeSize, playerdata.position, 0x0000ff, true);
+        makeNewLevel();
 
         //mouse = new THREE.Vector3( 0, 0, 1 );
         //projector = new THREE.Projector();
