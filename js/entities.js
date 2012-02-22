@@ -13,6 +13,21 @@ var world = [],
         numAnimals = 10,
         absorbed = 0;
 
+var rand, randbool, randColour;
+rand = function(scale){
+    scale = scale || 1;
+    return Math.random() * scale;
+};
+
+randbool = function(x){
+    x = x || 0.5;
+    return Math.random() > x;
+};
+
+randColour = function(){
+    return Math.floor(Math.random() * 16777215);
+};
+
 var Player = function(){
     this.position = new THREE.Vector3();
     this.arrayPosition = new THREE.Vector3();
@@ -41,7 +56,7 @@ var Animal = function(d){
     this.position.addSelf(this.arrayPosition);
     this.position.multiplyScalar(cubeSize);
 
-    this.colour = 0xff0000;//randColour();
+    this.colour = randColour();
     this.height = cubeSize;
     this.width = cubeSize;
 

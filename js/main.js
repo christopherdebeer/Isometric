@@ -34,6 +34,7 @@ $(document).ready(function(){
 
     var colours = [
         null,
+        0x333333, //grey
         0x0CA80C, //grass green
         0x0D4FBF, //water blue
         0x5C3C06 //mud brown
@@ -91,19 +92,7 @@ $(document).ready(function(){
         moveCamera();
     };
 
-    var rand = function(scale){
-        scale = scale || 1;
-        return Math.random() * scale;
-    };
-
-    var randbool = function(x){
-        x = x || 0.5;
-        return Math.random() > x;
-    };
-
-    var randColour = function(){
-        return '#' + Math.floor(Math.random() * 16777215).toString(16);
-    };
+    
 
     var render = function(){
         if (paused) { return; }
@@ -174,7 +163,6 @@ $(document).ready(function(){
         //Calculate the place the cube would be if it moved,
         //return true if that place is available
         //console.log(thing);
-
 
         var p = thing.arrayPosition,
             q = {x: p.x, y: p.y, z: p.z};
