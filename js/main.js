@@ -10,7 +10,8 @@ $(document).ready(function(){
         cameraOffset = new THREE.Vector3(4, 6, 7).multiplyScalar(cubeSize);
 
     var keyboard = new THREEx.KeyboardState(),
-        settings;
+        settings,
+        music;
 
     //var mouse, projector, ray, floor;
 
@@ -84,6 +85,14 @@ $(document).ready(function(){
                 animalsdata.push(a);
                 animalscubes.push(addCube(a.height, a.position, a.colour, true));
             }
+
+            music = new Audio("audio/music/level" + currentLevel + ".ogg");
+            //there's a loop property but its not supported everywhere so an event listener is letter for now.
+            music.addEventListener('ended', function() {
+                this.currentTime = 0;
+                this.play();
+            }, false);
+            music.play();
         });
     };
 
@@ -196,6 +205,8 @@ $(document).ready(function(){
                 alert("You win the current level");
                 currentLevel++;
 
+                music.pause();
+
                 clearScene();
                 createWorld();
 
@@ -267,16 +278,16 @@ $(document).ready(function(){
         var k = settings.keyboard.movement;
 
         if (keyboard.pressed(k.forwards)){
-                updatePos(playerdata, 'z', -1);
+            updatePos(playerdata, 'z', -1);
         }
         if (keyboard.pressed(k.left)){
-                updatePos(playerdata, 'x', -1);
+            updatePos(playerdata, 'x', -1);
         }
         if (keyboard.pressed(k.back)){
-                updatePos(playerdata, 'z', 1);
+            updatePos(playerdata, 'z', 1);
         }
         if (keyboard.pressed(k.right)){
-                updatePos(playerdata, 'x', 1);
+            updatePos(playerdata, 'x', 1);
         }
         if (keyboard.pressed(settings.keyboard.jump.up)){
             var p = playerdata.arrayPosition;
@@ -338,6 +349,8 @@ $(document).ready(function(){
         $('canvas').css({background : 'skyblue'});
 
         bindInputs();
+
+        
     };
 
     var run = function(time){
