@@ -5,6 +5,7 @@ $(document).ready(function(){
 
     var camera, scene, renderer,
         geometry, material,
+        rendering = true,
         cubes = [],
         cameraOffset = new THREE.Vector3(4, 6, 7).multiplyScalar(cubeSize);
 
@@ -185,16 +186,24 @@ $(document).ready(function(){
         //the method appears. Couldn't find it in Chrome.
         if (playerdata.arrayPosition.distanceTo(goaldata.arrayPosition) === 0){
             if (currentLevel < numLevels){
+                rendering = false;
+
                 alert("You win the current level");
                 currentLevel++;
+
                 clearScene();
                 createWorld();
+
+                rendering = true;
+                run();
+
                 return;
             } else {
                 alert("You've finished the game");
             }
         }
 
+        //These don't need updating every frame
         if (tick % 20 === 0){
             DOM.fps.text(fps + " FPS");
             GUI.setAbsorbed();
@@ -249,68 +258,41 @@ $(document).ready(function(){
     var bindInputs = function(){
         //Try and bind these keys in a loop, lots of duplication here
         //Couldn't get it to work previously.
-        key('w', function(){
-            updatePos(playerdata, 'z', -1);
+
+        $.getJSON('settings.json', function(data){
+            var k = data.keyboard.movement;
+            key(k.forwards, function(){
+                updatePos(playerdata, 'z', -1);
+            });
+
+            key(k.left, function(){
+                updatePos(playerdata, 'x', -1);
+            });
+
+            key(k.back, function(){
+                updatePos(playerdata, 'z', 1);
+            });
+
+            key(k.right, function(){
+                updatePos(playerdata, 'x', 1);
+            });
+
+            key(data.keyboard.jump.up, function(){
+                var p = playerdata.arrayPosition;
+                //Check if there's a block underneath before letting the player jump
+                if(flying || (p.y === 0 || world[p.y - 1][p.x].charAt(p.z) !== '0')){
+                    updatePos(playerdata, 'y', 1);
+                }
+            });
+
+            key(data.keyboard.jump.down, function(){
+                updatePos(playerdata, 'y', -1);
+            });
+
+            key(data.keyboard.misc.pause, function(){ paused = !paused; });
+            key(data.keyboard.fly, function(){ flying = !flying; });
+
         });
-
-        key('a', function(){
-            updatePos(playerdata, 'x', -1);
-        });
-
-        key('s', function(){
-            updatePos(playerdata, 'z', 1);
-        });
-
-        key('d', function(){
-            updatePos(playerdata, 'x', 1);
-        });
-
-        key('space', function(){
-            var p = playerdata.arrayPosition;
-            //Check if there's a block underneath before letting the player jump
-            if(flying || (p.y === 0 || world[p.y - 1][p.x].charAt(p.z) !== '0')){
-                updatePos(playerdata, 'y', 1);
-            }
-        });
-
-        key('\\', function(){
-            updatePos(playerdata, 'y', -1);
-        });
-
-        key('p', function(){ paused = !paused; });
-        key('f', function(){ flying = !flying; });
-
-        // $("canvas").click(function(e){
-        //     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        //     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-        //     ray.direction = projector.unprojectVector( mouse.clone(), camera );
-        //     ray.direction.subSelf( camera.position ).normalize();
-
-        //     intersects = ray.intersectObject(floor);
-        //     console.log(intersects);
-        //     // var pos = new THREE.Vector3(
-        //     //     (playerdata.position.x + 10) * Math.cos(playerdata.rotation.angle.x),
-        //     //     playerdata.position.y,
-        //     //     (playerdata.position.z + 10) * Math.sin(playerdata.rotation.angle.x)
-        //     // );
-        //     addCube(cubeSize, intersects.point, 0x0000ff, cubes, false);
-        // });
-
-        // $("canvas").mousemove(function(e){
-        //     //rotate the view based on the distance moved relative to the previous frame
-        //     var scaling = 0.005,
-        //         x = e.clientX,
-        //         y = e.clientY,
-        //         deltax = mousepos.x - x,
-        //         deltay = mousepos.y - y;
-        //     playerdata.rotation.speed.x = deltax * scaling;
-        //     playerdata.rotation.speed.y = deltay * scaling;
-
-        //     //save previous values for next time
-        //     mousepos.x = x;
-        //     mousepos.y = y;
-        // });
     };
 
     var init = function(){
@@ -346,9 +328,11 @@ $(document).ready(function(){
     };
 
     var run = function(time){
-        requestAnimationFrame(run);
-        render();
-        logic(time);
+        if (rendering){
+            requestAnimationFrame(run);
+            render();
+            logic(time);
+        }
     };
 
     var addCube = function(size, position, colour, shadows){

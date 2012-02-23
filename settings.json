@@ -1,0 +1,24 @@
+{
+	"keyboard" : {
+		"movement" : {
+			"forwards" : "w",
+			"left" : "a",
+			"right" : "d",
+			"back" : "s"
+		},
+
+		"jump" : {
+			"up" : "space",
+			"down" : "\\"
+		},
+
+		"fly" : "f",
+
+		"misc" : {
+			"pause" : "p"
+
+		}
+
+
+	}
+}

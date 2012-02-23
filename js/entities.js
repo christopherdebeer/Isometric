@@ -3,7 +3,7 @@ var pi = Math.PI,
     halfpi = pi / 2;
 
 var world = [],
-    currentLevel = 2,
+    currentLevel = 1,
     numLevels = 3,
     dimensions = {},
     playercube,
