@@ -45,8 +45,8 @@ $(document).ready(function(){
         
     var colours = [
         null,
-        0x333333, //grey
         0x0CA80C, //grass green
+        0x333333, //grey
         0x0D4FBF, //water blue
         0x5C3C06 //mud brown
     ];
@@ -93,6 +93,7 @@ $(document).ready(function(){
                 this.play();
             }, false);
             music.play();
+            
         });
     };
 
@@ -299,12 +300,6 @@ $(document).ready(function(){
         if (keyboard.pressed(settings.keyboard.jump.down)){
             updatePos(playerdata, 'y', -1);
         }
-        if (keyboard.pressed(settings.keyboard.misc.pause)){
-            updatePos(playerdata, 'y', -1);
-        }
-        if (keyboard.pressed(settings.keyboard.fly)){
-            updatePos(playerdata, 'y', -1);
-        }
     };
 
     var bindInputs = function(){
@@ -316,6 +311,7 @@ $(document).ready(function(){
 
             key(data.keyboard.misc.pause, function(){ paused = !paused; });
             key(data.keyboard.fly, function(){ flying = !flying; });
+            key(data.keyboard.misc.mute, function(){ music.muted = !music.muted; });
         });
     };
 

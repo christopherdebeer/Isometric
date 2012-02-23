@@ -1,0 +1,32 @@
+A cube-based game made using the Three.js library for WebGL.
+Currently referred to as Isometric, a final name is yet to be decided
+
+Planned features (short-term tasks managed in Issues tab)
+
+Add block types and detection for when the player is over them
+	-Fire
+	-Ice
+	-Shrink
+	-Spikes
+	-Water
+
+Upgrades for absorbing cubes
+	-grow in size?
+	-faster, stronger?
+
+Level editor
+
+Textures, not just colours
+
+
+Contributors
+
+Giles Lavelle: Code
+Chris Lloyd: Music
+
+Libraries / third party code used:
+
+Three.js
+jQuery
+keymaster.js
+THREEx.KeyboardState

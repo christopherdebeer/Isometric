@@ -15,8 +15,8 @@
 		"fly" : "f",
 
 		"misc" : {
-			"pause" : "p"
-
+			"pause" : "p",
+			"mute" : "m"
 		}
 
 
