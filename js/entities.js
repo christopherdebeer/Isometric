@@ -1,22 +1,3 @@
-var pi = Math.PI,
-    tau = 2 * pi,
-    halfpi = pi / 2;
-
-var world = [],
-    currentLevel = 1,
-    numLevels = 3,
-    dimensions = {},
-    playercube,
-    goalcube,
-    //worldSize = 20,
-    //numLayers = 5,
-    cubeSize = 10,
-    fov = 70,
-
-    numAnimals = 10,
-    absorbed = 0;
-
-var rand, randbool, randColour;
 rand = function(scale){
     scale = scale || 1;
     return Math.random() * scale;

@@ -1,17 +1,13 @@
 $(document).ready(function(){
-    String.prototype.replaceAt=function(index, char) {
-      return this.substr(0, index) + char + this.substr(index+char.length);
-   };
+   //  String.prototype.replaceAt=function(index, char) {
+   //    return this.substr(0, index) + char + this.substr(index+char.length);
+   // };
 
     var camera, scene, renderer,
         geometry, material,
         rendering = true,
         cubes = [],
         cameraOffset = new THREE.Vector3(4, 6, 7).multiplyScalar(cubeSize);
-
-    var keyboard = new THREEx.KeyboardState(),
-        settings,
-        music;
 
     //var mouse, projector, ray, floor;
 
@@ -32,29 +28,6 @@ $(document).ready(function(){
             DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
         }
     };
-    
-    // var mousepos = {
-    //     x : 0,
-    //     y : 0
-    // };
-    
-    //var gravity = 0.00981;
-
-    var paused = false,
-        flying = false;
-        
-    var colours = [
-        null,
-        0x0CA80C, //grass green
-        0x333333, //grey
-        0x0D4FBF, //water blue
-        0x5C3C06 //mud brown
-    ];
-
-    var animalscubes = [],
-        animalsdata = [],
-        playerdata,
-        goaldata;
 
     var createWorld = function(){
         $.getJSON('worlds/' + currentLevel + '.json', function(data){
@@ -228,16 +201,20 @@ $(document).ready(function(){
         
     };
 
-    var canMove = function(thing, axis, direction){
+    canMove = function(thing, axis, direction){
         //Calculate the place the cube would be if it moved,
         //return true if that place is available
-        //console.log(thing);
 
-        var p = thing.arrayPosition,
-            q = {x: p.x, y: p.y, z: p.z};
-            q[axis] += direction;
+        var p, q;
+        p = thing.arrayPosition;
+
+        // if (axis === 'y' && direction === -1 && p.y === 0){
+        //     return true; //Allow blocks to fall below the bottom of the world
+        // }
+
+        q = {x: p.x, y: p.y, z: p.z};
+        q[axis] += direction;
         
-
         //Check that the cube is within the bounds of the world
         if (
             q.x < 0 || q.x >= dimensions.x ||
@@ -254,7 +231,7 @@ $(document).ready(function(){
         //console.log('hit');
     };
 
-    var updatePos = function(thing, axis, direction){
+    updatePos = function(thing, axis, direction){
         //Don't try to move it again if its currently in the process of moving
         if (thing.isAnimating){ return; }
 
@@ -270,49 +247,6 @@ $(document).ready(function(){
     var moveCamera = function(){
         camera.position = cameraOffset.clone().addSelf(playerdata.position);
         camera.lookAt(playerdata.position);
-    };
-
-    var checkKeyboard = function(){
-        //Try and bind these keys in a loop, lots of duplication here
-        //Couldn't get it to work previously.
-
-        var k = settings.keyboard.movement;
-
-        if (keyboard.pressed(k.forwards)){
-            updatePos(playerdata, 'z', -1);
-        }
-        if (keyboard.pressed(k.left)){
-            updatePos(playerdata, 'x', -1);
-        }
-        if (keyboard.pressed(k.back)){
-            updatePos(playerdata, 'z', 1);
-        }
-        if (keyboard.pressed(k.right)){
-            updatePos(playerdata, 'x', 1);
-        }
-        if (keyboard.pressed(settings.keyboard.jump.up)){
-            var p = playerdata.arrayPosition;
-            //Check if there's a block underneath before letting the player jump
-            if(flying || (p.y === 0 || world[p.y - 1][p.x].charAt(p.z) !== '0')){
-                updatePos(playerdata, 'y', 1);
-            }
-        }
-        if (keyboard.pressed(settings.keyboard.jump.down)){
-            updatePos(playerdata, 'y', -1);
-        }
-    };
-
-    var bindInputs = function(){
-        //Bind keys that perform a distinct action.
-        //Control keys for player movement need more precise control
-
-        $.getJSON('settings.json', function(data){
-            settings = data;
-
-            key(data.keyboard.misc.pause, function(){ paused = !paused; });
-            key(data.keyboard.fly, function(){ flying = !flying; });
-            key(data.keyboard.misc.mute, function(){ music.muted = !music.muted; });
-        });
     };
 
     var init = function(){

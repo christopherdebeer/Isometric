@@ -3,6 +3,8 @@ A cube-based game made using the Three.js library for WebGL.
 
 Currently referred to as Isometric, a final name is yet to be decided
 
+[View the current state of the game](https://lavelle.github.com/Isometric)
+
 Planned features
 ----------------
 ###(short-term tasks managed in Issues tab)
@@ -22,6 +24,8 @@ Planned features
 
 - Textures, not just colours
 
+-Menu screen and theme song
+
 
 Contributors
 ------------
@@ -32,7 +36,7 @@ Contributors
 Libraries / third party code used:
 ----------------------------------
 
-- Three.js
-- jQuery
-- keymaster.js
-- THREEx.KeyboardState
+- [Three.js](https://github.com/)
+- [jQuery](https://github.com/)
+- [keymaster.js](https://github.com/)
+- [THREEx.KeyboardState](http://learningthreejs.com/blog/2011/09/12/lets-Make-a-3D-game-keyboard/)
