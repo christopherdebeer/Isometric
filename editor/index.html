@@ -327,8 +327,9 @@
 						world[(( object.position.x - 25 ) / 50) + 10][
 						( object.position.y - 25 ) / 50][
 						(( object.position.z - 25 ) / 50) + 10] =
-						colors.indexOf( object.material[ 0 ].color.hex & 0xffffff ) + 1;
-						console.log([(( object.position.x - 25 ) / 50) + 10, ( object.position.y - 25 ) / 50, (( object.position.z - 25 ) / 50) + 10]);
+						(colors.indexOf( object.material[ 0 ].color.hex & 0xffffff ) - 1).toString().replace("-1", "p").replace("0", "g");
+						console.log([(( object.position.x - 25 ) / 50) + 10, ( object.position.y - 25 ) / 50,
+							(( object.position.z - 25 ) / 50) + 10]);
 					}
 
 				}
