@@ -5,7 +5,7 @@ $(document).ready(function(){
 
     var camera, scene, renderer,
         geometry, material,
-        rendering = true,
+        levelFinished = false,
         cubes = [],
         cameraOffset = new THREE.Vector3(4, 6, 7).multiplyScalar(cubeSize);
 
@@ -22,6 +22,8 @@ $(document).ready(function(){
 
     };
 
+    var empty = "0g"; //blocks that can be moved through
+
     var GUI = {
         setAbsorbed: function(){
             var plural = absorbed === 1 ? '' : 's';
@@ -36,14 +38,9 @@ $(document).ready(function(){
             cubes = [];
 
             world = data.world;
-            var s = data.startPosition,
-                g = data.goalPosition;
 
             dimensions.y = world.length;
             parseWorld();
-
-            goaldata = new Goal(g);
-            playerdata = new Player(s);
 
             playercube = addCube(cubeSize, playerdata.position, playerdata.colour, true);
             goalcube = addCube(cubeSize, goaldata.position, goaldata.colour, true);
@@ -95,7 +92,17 @@ $(document).ready(function(){
                 line = layer[j].split('');
 
                 for (k = 0; k < line.length; k++) {
-                    cell = +line[k];
+                    cell = line[k];
+
+                    if (cell === 'p'){
+                        playerdata = new Player({x : j, y: i, z: k});
+                        break;
+                    }
+                    if (cell === 'g'){
+                        goaldata = new Goal({x : j, y: i, z: k});
+                        break;
+                    }
+                    cell = +cell;
 
                     if(cell !== 0){
                         var pos = new THREE.Vector3(j, i, k);
@@ -104,7 +111,6 @@ $(document).ready(function(){
                     }
                 }
             }
-
         }
 
         dimensions.x = j;
@@ -173,21 +179,9 @@ $(document).ready(function(){
         //This should be replaced with vector1.equals(vector2) if
         //the method appears. Couldn't find it in Chrome.
         if (playerdata.arrayPosition.distanceTo(goaldata.arrayPosition) === 0){
+            levelFinished = true;
             if (currentLevel < numLevels){
-                rendering = false;
-
-                alert("You win the current level");
-                currentLevel++;
-
-                music.pause();
-
-                clearScene();
-                createWorld();
-
-                rendering = true;
-                run();
-
-                return;
+                
             } else {
                 alert("You've finished the game");
             }
@@ -225,7 +219,8 @@ $(document).ready(function(){
         }
 
         //Check whether the block is empty
-        if(world[q.y][q.x].charAt(q.z) === '0'){
+        var cell = world[q.y][q.x].charAt(q.z);
+        if(empty.indexOf(cell) !== -1){
             return true;
         }
         //console.log('hit');
@@ -284,11 +279,21 @@ $(document).ready(function(){
     };
 
     var run = function(time){
-        if (rendering){
-            requestAnimationFrame(run);
-            render();
-            logic(time);
+        if (levelFinished){
+            alert("You win the current level");
+            currentLevel++;
+
+            music.pause();
+
+            clearScene();
+            createWorld();
+
+            levelFinished = false;
         }
+        requestAnimationFrame(run);
+        render();
+        logic(time);
+
     };
 
     var addCube = function(size, position, colour, shadows){

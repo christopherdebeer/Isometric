@@ -3,7 +3,9 @@ A cube-based game made using the Three.js library for WebGL.
 
 Currently referred to as Isometric, a final name is yet to be decided
 
-[View the current state of the game](https://lavelle.github.com/Isometric)
+[View the current state of the game](http://lavelle.github.com/Isometric)
+
+Most development happens on the gh-pages branch so the latest version can always be viewed online
 
 Planned features
 ----------------
@@ -24,7 +26,7 @@ Planned features
 
 - Textures, not just colours
 
--Menu screen and theme song
+- Menu screen and theme song
 
 
 Contributors
@@ -34,10 +36,13 @@ Contributors
 - [Chris Lloyd](https://github.com/Lundi): Music
 - [Sam Green](https://github.com/Nextil): Code - Level Editor
 
+Want to help out? Code, level designs, textures, music and ideas are all welcome!
+
 Libraries / third party code used:
 ----------------------------------
 
 - [Three.js](https://github.com/mrdoob/three.js)
-- [jQuery](https://github.com/jquery/jquery
+- [jQuery](https://github.com/jquery/jquery)
 - [keymaster.js](https://github.com/madrobby/keymaster)
 - [THREEx.KeyboardState](http://learningthreejs.com/blog/2011/09/12/lets-Make-a-3D-game-keyboard/)
+- [Voxels Demo](http://mrdoob.com/129/Voxels) by [mrdoob](https://github.com/mrdoob) for the level editor.
