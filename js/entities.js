@@ -33,6 +33,7 @@ function Player(p){
     this.position.addSelf(this.arrayPosition);
     this.position.multiplyScalar(cubeSize);
     this.colour = 0xff0000;
+    this.texture = textures.player;
 }
 
 function Animal(d){

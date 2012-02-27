@@ -27,11 +27,6 @@ $(document).ready(function(){
     var secs = 0,
         hundredths = 0;
 
-    var textures = {
-        grey: THREE.ImageUtils.loadTexture("images/textures/grey.png")
-    };
-
-
     var GUI = {
         setAbsorbed: function(){
             var plural = absorbed === 1 ? '' : 's';
@@ -91,7 +86,7 @@ $(document).ready(function(){
             dimensions.y = world.length;
             parseWorld();
 
-            playercube = addCube(cubeSize, playerdata.position, playerdata.colour, true);
+            playercube = addCube(cubeSize, playerdata.position, false, true, playerdata.texture);
             goalcube = addCube(cubeSize, goaldata.position, goaldata.colour, true);
             
             moveCamera();
@@ -133,9 +128,18 @@ $(document).ready(function(){
                     cell = +cell;
 
                     if(cell !== 0){
+                        var texture;
+                        switch (cell){
+                            case 1:
+                                texture = textures.grey;
+                                break;
+                            case 2:
+                                texture = textures.water;
+                                break;
+                        }
                         var pos = new THREE.Vector3(j, i, k);
                         pos.multiplyScalar(cubeSize);
-                        cubes.push(addCube(cubeSize, pos, false, true, textures.grey));
+                        cubes.push(addCube(cubeSize, pos, false, true, texture));
                     }
                 }
             }

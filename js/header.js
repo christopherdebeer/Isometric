@@ -31,6 +31,13 @@ var colours = [
     0x5C3C06 //mud brown
 ];
 
+var texPath = "images/textures/";
+var textures = {
+    grey: THREE.ImageUtils.loadTexture(texPath + "grey.png"),
+    player: THREE.ImageUtils.loadTexture(texPath + "player.png"),
+    water: THREE.ImageUtils.loadTexture(texPath + "water.png")
+};
+
 var DOM;
 var died = false;
 var startPos;
