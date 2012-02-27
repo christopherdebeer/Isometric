@@ -21,7 +21,7 @@
 
 		<script type="text/javascript">
 
-			var container, interval,
+			var container, worldPopup, interval,
 			camera, scene, renderer,
 			projector, plane, cube, linesMaterial,
 			color = 0,colors = [ 0x1F4FDF, 0xDFAF1F, 0xDF1F1F, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x7F1FDF, 0xDF1FAF, 0xEFEFEF, 0x303030 ],
@@ -46,7 +46,19 @@
 				info.style.textAlign = 'center';
 				info.innerHTML = '<span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"><strong>0 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <strong>middle mouse</strong>: rotate | <a id="link" href="javascript:saveWorld();">save</a> <a href="javascript:screenshot();">screenshot</a> <a href="javascript:clear();">clear</a></span>';
 				container.appendChild( info );
- 
+				worldPopup = document.createElement( 'div' );
+				worldPopup.style.position = 'absolute';
+				worldPopup.style.display = 'none';
+				worldPopup.style.zIndex = '100';
+				worldPopup.style.width = '90%';
+				worldPopup.style.height = '90%';
+				worldPopup.style.left = '5%';
+				worldPopup.style.top = '5%';
+				worldPopup.style.backgroundColor = 'white';
+				worldPopup.style.border = '1px solid #999';
+				worldPopup.innerHTML = '<textarea id="worldDisplay" style="height: 100%; width: 95%;"></textarea><a style="position: absolute; right: 5px; top: 5px; padding: 3px 7px; background: #444; color: white; text-decoration: none;" href="javascript:closePopup();">X</span>'
+				container.appendChild( worldPopup );
+
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.x = radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
 				camera.position.y = radious * Math.sin( phi * Math.PI / 360 );
@@ -126,6 +138,10 @@
 
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 
+			}
+
+			function closePopup() {
+				worldPopup.style.display = 'none';
 			}
 
 			function onDocumentKeyDown( event ) {
@@ -329,27 +345,24 @@
 						(( object.position.z - 25 ) / 50) + 10] =
 						(colors.indexOf( object.material[ 0 ].color.hex & 0xffffff ) - 1).toString().replace("-1", "p").replace("0", "g");
 						console.log([(( object.position.x - 25 ) / 50) + 10, ( object.position.y - 25 ) / 50,
-							(( object.position.z - 25 ) / 50) + 10]);
+							(( object.position.z - 25 ) / 50) + 10, (colors.indexOf( object.material[ 0 ].color.hex & 0xffffff ) - 1).toString().replace("-1", "p").replace("0", "g")]);
 					}
 
 				}
-
-				worldFile = {"world": []};
-				for (var z = 0; z < 20; z++) {
-					layer = [];
-					for (var y = 0; y < 20; y++) {
-						line = "";
-						for (var x = 0; x < 20; x++) {
-							line += world[x][z][y];
+				var worldFile = {"world": []};
+				for (var lay = 0; lay < 20; lay++) {
+					var layer = [];
+					for (var lin = 0; lin < 20; lin++) {
+						var line = "";
+						for (var vox = 0; vox < 20; vox++) {
+							line += world[lin][lay][vox];
 						}
 						layer.push(line);
 					}
 					worldFile["world"].push(layer);
-					console.log(layer);
 				}
-
-				prompt("Level Data:", JSON.stringify(worldFile));
-
+				document.getElementById('worldDisplay').innerHTML = JSON.stringify(worldFile, null, 4);
+				worldPopup.style.display = 'inline';
 			}
 
 			function offsetScene( x, z ) {
@@ -472,7 +485,5 @@
 			}
 
 		</script><div><div style="position: absolute; top: 5px; width: 100%; text-align: center; "><span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"><strong>0 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <strong>middle mouse</strong>: rotate | <a id="link" href="javascript:saveWorld();">save</a> <a href="javascript:screenshot();">screenshot</a> <a href="javascript:clear();">clear</a></span></div><canvas width="1440" height="815"></canvas></div>
-
-	
 
 </body><link type="text/css" rel="stylesheet" href="data:text/css,"></html>
