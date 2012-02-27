@@ -19,8 +19,9 @@ var world = [],
 
 var rand, randbool, randColour;
 
-var paused = false,
-    flying = false;
+var paused = true,
+    flying = false,
+    begun = false;
     
 var colours = [
     null,
