@@ -35,7 +35,8 @@ var texPath = "images/textures/";
 var textures = {
     grey: THREE.ImageUtils.loadTexture(texPath + "grey.png"),
     player: THREE.ImageUtils.loadTexture(texPath + "player.png"),
-    water: THREE.ImageUtils.loadTexture(texPath + "water.png")
+    water: THREE.ImageUtils.loadTexture(texPath + "water.png"),
+    fire: THREE.ImageUtils.loadTexture(texPath + "fire.png")
 };
 
 var DOM;

@@ -24,6 +24,7 @@ $(document).ready(function(){
     };
 
     var empty = "0g"; //blocks that can be moved through
+    var dangerous = "3"; //blocks that cause death
     var secs = 0,
         hundredths = 0;
 
@@ -136,6 +137,9 @@ $(document).ready(function(){
                             case 2:
                                 texture = textures.water;
                                 break;
+                            case 3:
+                                texture = textures.fire;
+                                break;
                         }
                         var pos = new THREE.Vector3(j, i, k);
                         pos.multiplyScalar(cubeSize);
@@ -195,19 +199,7 @@ $(document).ready(function(){
                     //animalscubes.splice(i);
                     //animalsdata.splice(i);
                     //absorbed++;
-                    paused = true;
-                    window.clearInterval(timer);
-                    previousTimes.push(+timeString);
-                    var best = Math.max.apply(Math, previousTimes);
-                    var message = "Game Over" +
-                        "<br>You survived for " + timeString + " seconds" +
-                        "<br>Your best time is " + best + " seconds" +
-                        "<br>Press enter to restart";
-                    DOM.overlay.html(message);
-                    DOM.overlay.show();
-                    died = true;
-
-                    
+                    die();
                 }
             }
             if (data.distanceToMove > 0){
@@ -236,6 +228,20 @@ $(document).ready(function(){
             GUI.setAbsorbed();
         }
         
+    };
+
+    var die = function(){
+        paused = true;
+        window.clearInterval(timer);
+        previousTimes.push(+timeString);
+        var best = Math.max.apply(Math, previousTimes);
+        var message = "Game Over" +
+            "<br>You survived for " + timeString + " seconds" +
+            "<br>Your best time is " + best + " seconds" +
+            "<br>Press enter to restart";
+        DOM.overlay.html(message);
+        DOM.overlay.show();
+        died = true;
     };
 
     canMove = function(thing, axis, direction){
@@ -279,6 +285,19 @@ $(document).ready(function(){
             thing.distanceToMove = cubeSize;
             thing.axis = axis;
             thing.direction = direction;
+            var a= thing.arrayPosition;
+            if (a.y > 0 && dangerous.indexOf(world[a.y - 1][a.x][a.z]) !== -1){
+                //The entity is on a block that causes death, like fire or spikes
+                console.log("dead");
+                if (thing === playerdata){
+                    die();
+                    return;
+                }
+                var index = animalsdata.indexOf(thing);
+                if (index !== -1){
+                    scene.remove(animalscubes[index]);
+                }
+            }
         }
     };
 
