@@ -104,6 +104,34 @@ body{
 	padding: 5px;
 }
 
+#wrap{
+	position: relative;
+}
+
+#timer{
+	position: absolute;
+	font-size: 50px;
+	top: 30px;
+	color: black;
+	font-weight: bold;
+	left: 50%;
+}
+
+#overlay{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,.8);
+	color: white;
+	padding: 20px;
+	font-size: 30px;
+	text-align: center;
+	display: none;
+	line-height: 35px;
+}
+
 .round{
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 1opx;

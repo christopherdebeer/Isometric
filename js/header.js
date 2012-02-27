@@ -30,6 +30,15 @@ var colours = [
     0x5C3C06 //mud brown
 ];
 
+var DOM;
+var died = false;
+var startPos;
+
+var timer,
+    previousTimes = [],
+    startTimer,
+    timeString;
+
 var animalscubes = [],
     animalsdata = [],
 

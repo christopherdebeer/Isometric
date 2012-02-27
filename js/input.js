@@ -35,8 +35,23 @@ var bindInputs = function(){
     $.getJSON('settings.json', function(data){
         settings = data;
 
-        key(data.keyboard.misc.pause, function(){ paused = !paused; });
+        key(data.keyboard.misc.pause, function(){
+            if (died) { return; }
+            paused = !paused;
+            DOM.overlay.text("Game Paused");
+            DOM.overlay.toggle();
+        });
         key(data.keyboard.fly, function(){ flying = !flying; });
         key(data.keyboard.misc.mute, function(){ music.muted = !music.muted; });
+        key(data.keyboard.misc.restart, function(){
+            if (!died) { return; }
+            died = false;
+            DOM.overlay.hide();
+            playerdata = new Player(startPos);
+            startTimer();
+            paused = false;
+        });
+
+        //key('r', function(){ playerdata.position = new THREE.Vector3(0, 0, 0); });
     });
 };

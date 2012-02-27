@@ -28,6 +28,8 @@ Animal.prototype.constructor = Animal;
 
 function Player(p){
     this.arrayPosition = new THREE.Vector3(p.x, p.y, p.z);
+    this.position = new THREE.Vector3();
+    
     this.position.addSelf(this.arrayPosition);
     this.position.multiplyScalar(cubeSize);
     this.colour = 0xff0000;

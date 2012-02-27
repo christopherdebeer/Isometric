@@ -15,14 +15,20 @@ $(document).ready(function(){
         oldTime = +new Date(),
         tick = 1;
 
-    var DOM = {
+    DOM = {
         fps: $("#fps"),
         absorbed: $("#absorbed"),
-        game: $("#game")
-
+        game: $("#game"),
+        overlay: $("#overlay"),
+        timer: $("#timer")
     };
 
     var empty = "0g"; //blocks that can be moved through
+    var secs = 0,
+        hundredths = 0;
+
+    
+
 
     var GUI = {
         setAbsorbed: function(){
@@ -31,40 +37,29 @@ $(document).ready(function(){
         }
     };
 
-    var createWorld = function(){
-        $.getJSON('worlds/' + currentLevel + '.json', function(data){
-            animalscubes = [];
-            animalsdata = [];
-            cubes = [];
+    var muted = true; //false for production
 
-            world = data.world;
+    startTimer = function(){
+        secs = 0;
+        hundredths = 0;
+        timer = window.setInterval(function(){
+            if (paused) { return; }
+            timeString = ((secs < 10 ? "0" : "") + secs);
+            DOM.timer.text(timeString);
+            hundredths++;
+            secs = hundredths / 100;
+        }, 10);
+    };
 
-            dimensions.y = world.length;
-            parseWorld();
-
-            playercube = addCube(cubeSize, playerdata.position, playerdata.colour, true);
-            goalcube = addCube(cubeSize, goaldata.position, goaldata.colour, true);
-            
-            playercube.position = playerdata.position;
-            goalcube.position = goaldata.position;
-
-            moveCamera();
-
-            for (var i = 0; i < numAnimals; i++) {
-                var a = new Animal(dimensions);
-                animalsdata.push(a);
-                animalscubes.push(addCube(a.height, a.position, a.colour, true));
-            }
-
-            music = new Audio("audio/music/level" + currentLevel + ".ogg");
-            //there's a loop property but its not supported everywhere so an event listener is letter for now.
-            music.addEventListener('ended', function() {
-                this.currentTime = 0;
-                this.play();
-            }, false);
-            music.play();
-            
-        });
+    var loadMusic = function(){
+        music = new Audio("audio/music/level" + currentLevel + ".ogg");
+        //there's a loop property but its not supported everywhere so an event listener is letter for now.
+        music.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+        music.muted = muted;
+        music.play();
     };
 
     var clearScene = function(){
@@ -81,6 +76,36 @@ $(document).ready(function(){
         scene.remove(goalcube);
     };
 
+    var createWorld = function(){
+        animalscubes = [];
+        animalsdata = [];
+        cubes = [];
+
+        playerdata = new Player({x : 0, y: 0, z: 0});
+        goaldata = new Goal({x : 0, y: 0, z: 0});
+        $.getJSON('worlds/' + currentLevel + '.json', function(data){
+            world = data.world;
+
+            dimensions.y = world.length;
+            parseWorld();
+
+            playercube = addCube(cubeSize, playerdata.position, playerdata.colour, true);
+            goalcube = addCube(cubeSize, goaldata.position, goaldata.colour, true);
+            
+            moveCamera();
+
+            for (var i = 0; i < numAnimals; i++) {
+                var a = new Animal(dimensions);
+                animalsdata.push(a);
+                animalscubes.push(addCube(a.height, a.position, a.colour, true));
+            }
+
+            loadMusic();
+        });
+        startTimer();
+    };
+
+    //Add cubes to the scene based on level data
     var parseWorld = function(){
         var i, j, k,
             layer, line, cell;
@@ -95,7 +120,8 @@ $(document).ready(function(){
                     cell = line[k];
 
                     if (cell === 'p'){
-                        playerdata = new Player({x : j, y: i, z: k});
+                        startPos = {x : j, y: i, z: k};
+                        playerdata = new Player(startPos);
                         break;
                     }
                     if (cell === 'g'){
@@ -128,12 +154,13 @@ $(document).ready(function(){
 
         var i;
 
-        checkKeyboard();
 
         tick = tick > 100 ? 1 : tick + 1;
         fps = Math.round(1000 / (time - oldTime));
         oldTime = time;
 
+        checkKeyboard();
+        
         var numEntities = animalscubes.length + 1;
         for (i = 0; i < numEntities; i++) {
             var entity, data;
@@ -157,11 +184,24 @@ $(document).ready(function(){
                 //This should be replaced with vector1.equals(vector2) if
                 //the method appears. Couldn't find it in Chrome.
                 if (playerdata.arrayPosition.distanceTo(data.arrayPosition) === 0){
-                    console.log("absorb");
-                    scene.remove(entity);
+                    //console.log("absorb");
+                    //scene.remove(entity);
                     //animalscubes.splice(i);
                     //animalsdata.splice(i);
-                    absorbed++;
+                    //absorbed++;
+                    paused = true;
+                    window.clearInterval(timer);
+                    previousTimes.push(+timeString);
+                    var best = Math.max.apply(Math, previousTimes);
+                    var message = "Game Over" +
+                        "<br>You survived for " + timeString + " seconds" +
+                        "<br>Your best time is " + best + " seconds" +
+                        "<br>Press enter to restart";
+                    DOM.overlay.html(message);
+                    DOM.overlay.show();
+                    died = true;
+
+                    
                 }
             }
             if (data.distanceToMove > 0){
@@ -174,17 +214,14 @@ $(document).ready(function(){
 
             entity.position = data.position;
         }
+
         moveCamera();
+
 
         //This should be replaced with vector1.equals(vector2) if
         //the method appears. Couldn't find it in Chrome.
         if (playerdata.arrayPosition.distanceTo(goaldata.arrayPosition) === 0){
             levelFinished = true;
-            if (currentLevel < numLevels){
-                
-            } else {
-                alert("You've finished the game");
-            }
         }
 
         //These don't need updating every frame
@@ -245,6 +282,8 @@ $(document).ready(function(){
     };
 
     var init = function(){
+        //Things that only happen once, when the page loads happen here
+        //If it happens any other time, put it in an external function and call it here.
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100 * cubeSize);

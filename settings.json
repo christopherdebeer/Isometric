@@ -16,7 +16,8 @@
 
 		"misc" : {
 			"pause" : "p",
-			"mute" : "m"
+			"mute" : "m",
+			"restart" : "enter"
 		}
 
 
