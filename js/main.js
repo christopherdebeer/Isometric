@@ -27,7 +27,9 @@ $(document).ready(function(){
     var secs = 0,
         hundredths = 0;
 
-    
+    var textures = {
+        grey: THREE.ImageUtils.loadTexture("images/textures/grey.png")
+    };
 
 
     var GUI = {
@@ -133,7 +135,7 @@ $(document).ready(function(){
                     if(cell !== 0){
                         var pos = new THREE.Vector3(j, i, k);
                         pos.multiplyScalar(cubeSize);
-                        cubes.push(addCube(cubeSize, pos, colours[cell], true));
+                        cubes.push(addCube(cubeSize, pos, false, true, textures.grey));
                     }
                 }
             }
@@ -335,9 +337,14 @@ $(document).ready(function(){
 
     };
 
-    var addCube = function(size, position, colour, shadows){
+    var addCube = function(size, position, colour, shadows, texture){
         geometry = new THREE.CubeGeometry(size, size, size);
-        material = new THREE.MeshLambertMaterial({color: colour});
+        var args = {
+            shading: THREE.SmoothShading
+        };
+        if (colour) { args.color = colour; }
+        if (texture) { args.map = texture; }
+        material = new THREE.MeshLambertMaterial(args);
 
         mesh = new THREE.Mesh(geometry, material);
 
