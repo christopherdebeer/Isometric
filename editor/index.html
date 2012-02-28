@@ -56,7 +56,7 @@
 				worldPopup.style.top = '5%';
 				worldPopup.style.backgroundColor = 'white';
 				worldPopup.style.border = '1px solid #999';
-				worldPopup.innerHTML = '<textarea id="worldDisplay" style="height: 100%; width: 95%;"></textarea><a style="position: absolute; right: 5px; top: 5px; padding: 3px 7px; background: #444; color: white; text-decoration: none;" href="javascript:closePopup();">X</span>'
+				worldPopup.innerHTML = '<textarea id="worldDisplay" style="height: 100%; width: 95%;"></textarea><a style="position: absolute; right: 0; top: 0; padding: 3px 7px; background: #444; color: white; text-decoration: none;" href="javascript:closePopup();">X</span>'
 				container.appendChild( worldPopup );
 
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -133,10 +133,10 @@
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.getElementsByTagName('canvas')[0].addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.getElementsByTagName('canvas')[0].addEventListener( 'mouseup', onDocumentMouseUp, false );
 
-				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+				document.getElementsByTagName('canvas')[0].addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 
 			}
 
@@ -181,7 +181,6 @@
 			}
 
 			function onDocumentMouseDown( event ) {
-
 				event.preventDefault();
 
 				if (event.button == 1) {
@@ -192,7 +191,7 @@
 				onMouseDownPhi = phi;
 				onMouseDownPosition.x = event.clientX;
 				onMouseDownPosition.y = event.clientY;
-
+			
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -361,7 +360,7 @@
 					}
 					worldFile["world"].push(layer);
 				}
-				document.getElementById('worldDisplay').innerHTML = JSON.stringify(worldFile, null, 4);
+				document.getElementById('worldDisplay').value = JSON.stringify(worldFile, null, 4);
 				worldPopup.style.display = 'inline';
 			}
 
@@ -484,6 +483,6 @@
 
 			}
 
-		</script><div><div style="position: absolute; top: 5px; width: 100%; text-align: center; "><span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"><strong>0 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <strong>middle mouse</strong>: rotate | <a id="link" href="javascript:saveWorld();">save</a> <a href="javascript:screenshot();">screenshot</a> <a href="javascript:clear();">clear</a></span></div><canvas width="1440" height="815"></canvas></div>
+		</script><!-- <div><div style="position: absolute; top: 5px; width: 100%; text-align: center; "><span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"><strong>0 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <strong>middle mouse</strong>: rotate | <a id="link" href="javascript:saveWorld();">save</a> <a href="javascript:screenshot();">screenshot</a> <a href="javascript:clear();">clear</a></span></div> <canvas width="1440" height="815"></canvas>--></div>
 
 </body><link type="text/css" rel="stylesheet" href="data:text/css,"></html>
