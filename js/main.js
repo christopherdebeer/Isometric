@@ -17,22 +17,23 @@ $(document).ready(function(){
 
     DOM = {
         fps: $("#fps"),
-        absorbed: $("#absorbed"),
+        //absorbed: $("#absorbed"),
         game: $("#game"),
         overlay: $("#overlay"),
+        message: $("#message"),
         timer: $("#timer")
     };
 
-    var empty = "0g"; //blocks that can be moved through
+    var empty = "02gp"; //blocks that can be moved through
     var dangerous = "3"; //blocks that cause death
     var secs = 0,
         hundredths = 0;
 
     var GUI = {
-        setAbsorbed: function(){
-            var plural = absorbed === 1 ? '' : 's';
-            DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
-        }
+        // setAbsorbed: function(){
+        //     var plural = absorbed === 1 ? '' : 's';
+        //     DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
+        // }
     };
 
     var muted = true; //false for production
@@ -225,7 +226,7 @@ $(document).ready(function(){
         //These don't need updating every frame
         if (tick % 20 === 0){
             DOM.fps.text(fps + " FPS");
-            GUI.setAbsorbed();
+            //GUI.setAbsorbed();
         }
         
     };
@@ -267,7 +268,15 @@ $(document).ready(function(){
             return false;
         }
 
-        //Check whether the block is empty
+        //Detect collisions with other entities
+        // for (var i = 0; i < animalsdata.length; i++) {
+        //     var pos = animalsdata[i].arrayPosition;
+        //     if(pos.distanceTo(p) === 0){
+        //         return false;
+        //     }
+        // }
+
+        //Detect collisions with the world
         var cell = world[q.y][q.x].charAt(q.z);
         if(empty.indexOf(cell) !== -1){
             return true;
@@ -333,7 +342,7 @@ $(document).ready(function(){
         renderer.shadowMapEnabled = true;
 
         DOM.game.append(renderer.domElement);
-        GUI.setAbsorbed();
+        //GUI.setAbsorbed();
 
         $('canvas').css({background : 'skyblue'});
 
@@ -362,11 +371,17 @@ $(document).ready(function(){
 
     var addCube = function(size, position, colour, shadows, texture){
         geometry = new THREE.CubeGeometry(size, size, size);
+        
         var args = {
             shading: THREE.SmoothShading
         };
         if (colour) { args.color = colour; }
-        if (texture) { args.map = texture; }
+        if (texture) {
+            texture.minFilter = THREE.NearestFilter;
+            texture.magFilter = THREE.NearestFilter;
+            args.map = texture;
+        }
+
         material = new THREE.MeshLambertMaterial(args);
 
         mesh = new THREE.Mesh(geometry, material);

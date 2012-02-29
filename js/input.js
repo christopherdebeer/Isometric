@@ -38,7 +38,7 @@ var bindInputs = function(){
         key(data.keyboard.misc.pause, function(){
             if (died) { return; }
             paused = !paused;
-            DOM.overlay.html("<h1>Game Paused</h1>");
+            DOM.message.html("<h1>Game Paused</h1>");
             DOM.overlay.toggle();
         });
         key(data.keyboard.fly, function(){ flying = !flying; });
