@@ -14,18 +14,16 @@ $(document).ready(function(){
     var oldTime = +new Date(),
         tick = 1;
 
-    DOM = {
-        //fps: $("#fps"),
-        //absorbed: $("#absorbed"),
-        game: $("#game"),
-        overlay: $("#overlay"),
-        message: $("#message"),
-        splash: $("#splash"),
-        timer: $("#timer")
-    };
+    var ids = ['game', 'overlay', 'message', 'splash', 'timer'];
+    DOM = {};
+    for (var i = 0; i < ids.length; i++) {
+        id = ids[i];
+        DOM[id] = $('#' + id);
+    }
 
-    var empty = "02gp"; //blocks that can be moved through
-    var dangerous = "3"; //blocks that cause death
+    var empty = "02gp", //blocks that can be moved through
+        dangerous = "3"; //blocks that cause death
+
     var secs = 0,
         hundredths = 0;
 
