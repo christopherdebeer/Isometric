@@ -21,6 +21,7 @@ $(document).ready(function(){
         game: $("#game"),
         overlay: $("#overlay"),
         message: $("#message"),
+        splash: $("#splash"),
         timer: $("#timer")
     };
 
@@ -240,7 +241,7 @@ $(document).ready(function(){
             "<br>You survived for " + timeString + " seconds" +
             "<br>Your best time is " + best + " seconds" +
             "<br>Press enter to restart";
-        DOM.overlay.html(message);
+        DOM.message.html(message);
         DOM.overlay.show();
         died = true;
     };
@@ -338,7 +339,8 @@ $(document).ready(function(){
         //ray = new THREE.Ray( camera.position );
 
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth - 300, window.innerHeight - 50);
+        var border = 20;
+        renderer.setSize(window.innerWidth - border, window.innerHeight - border);
         renderer.shadowMapEnabled = true;
 
         DOM.game.append(renderer.domElement);

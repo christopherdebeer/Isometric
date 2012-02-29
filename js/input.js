@@ -47,6 +47,7 @@ var bindInputs = function(){
             if (!begun){
                 DOM.overlay.hide();
                 DOM.overlay.css({"background" : "rgba(0,0,0,.8)"});
+                DOM.splash.html("");
                 paused = false;
                 begun = true;
             } else {
