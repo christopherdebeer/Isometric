@@ -11,60 +11,59 @@ $(document).ready(function(){
 
     //var mouse, projector, ray, floor;
 
-    var fps,
-        oldTime = +new Date(),
+    var oldTime = +new Date(),
         tick = 1;
 
-    var DOM = {
-        fps: $("#fps"),
-        absorbed: $("#absorbed"),
-        game: $("#game")
-
+    DOM = {
+        //fps: $("#fps"),
+        //absorbed: $("#absorbed"),
+        game: $("#game"),
+        overlay: $("#overlay"),
+        message: $("#message"),
+        splash: $("#splash"),
+        timer: $("#timer")
     };
 
-    var empty = "0g"; //blocks that can be moved through
+    var empty = "02gp"; //blocks that can be moved through
+    var dangerous = "3"; //blocks that cause death
+    var secs = 0,
+        hundredths = 0;
 
     var GUI = {
-        setAbsorbed: function(){
-            var plural = absorbed === 1 ? '' : 's';
-            DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
-        }
+        // setAbsorbed: function(){
+        //     var plural = absorbed === 1 ? '' : 's';
+        //     DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
+        // }
     };
 
-    var createWorld = function(){
-        $.getJSON('worlds/' + currentLevel + '.json', function(data){
-            animalscubes = [];
-            animalsdata = [];
-            cubes = [];
+    var muted = true; //false for production
 
-            world = data.world;
+    var stats = new Stats(),
+        fpsCounter = $(stats.getDomElement()).addClass('fps');
+    $('body').append(fpsCounter);
+    window.setInterval(function(){ stats.update(); }, 1000 / 60);
 
-            dimensions.y = world.length;
-            parseWorld();
+    startTimer = function(){
+        secs = 0;
+        hundredths = 0;
+        timer = window.setInterval(function(){
+            if (paused) { return; }
+            timeString = ((secs < 10 ? "0" : "") + secs);
+            DOM.timer.text(timeString);
+            hundredths++;
+            secs = hundredths / 100;
+        }, 10);
+    };
 
-            playercube = addCube(cubeSize, playerdata.position, playerdata.colour, true);
-            goalcube = addCube(cubeSize, goaldata.position, goaldata.colour, true);
-            
-            playercube.position = playerdata.position;
-            goalcube.position = goaldata.position;
-
-            moveCamera();
-
-            for (var i = 0; i < numAnimals; i++) {
-                var a = new Animal(dimensions);
-                animalsdata.push(a);
-                animalscubes.push(addCube(a.height, a.position, a.colour, true));
-            }
-
-            music = new Audio("audio/music/level" + currentLevel + ".ogg");
-            //there's a loop property but its not supported everywhere so an event listener is letter for now.
-            music.addEventListener('ended', function() {
-                this.currentTime = 0;
-                this.play();
-            }, false);
-            music.play();
-            
-        });
+    var loadMusic = function(){
+        music = new Audio("audio/music/level" + currentLevel + ".ogg");
+        //there's a loop property but its not supported everywhere so an event listener is letter for now.
+        music.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+        music.muted = muted;
+        music.play();
     };
 
     var clearScene = function(){
@@ -81,6 +80,36 @@ $(document).ready(function(){
         scene.remove(goalcube);
     };
 
+    var createWorld = function(){
+        animalscubes = [];
+        animalsdata = [];
+        cubes = [];
+
+        playerdata = new Player({x : 0, y: 0, z: 0});
+        goaldata = new Goal({x : 0, y: 0, z: 0});
+        $.getJSON('worlds/' + currentLevel + '.json', function(data){
+            world = data.world;
+
+            dimensions.y = world.length;
+            parseWorld();
+
+            playercube = addCube(cubeSize, playerdata.position, false, true, playerdata.texture);
+            goalcube = addCube(cubeSize, goaldata.position, goaldata.colour, true);
+            
+            moveCamera();
+
+            for (var i = 0; i < numAnimals; i++) {
+                var a = new Animal(dimensions);
+                animalsdata.push(a);
+                animalscubes.push(addCube(a.height, a.position, a.colour, true));
+            }
+
+            loadMusic();
+        });
+        startTimer();
+    };
+
+    //Add cubes to the scene based on level data
     var parseWorld = function(){
         var i, j, k,
             layer, line, cell;
@@ -95,7 +124,8 @@ $(document).ready(function(){
                     cell = line[k];
 
                     if (cell === 'p'){
-                        playerdata = new Player({x : j, y: i, z: k});
+                        startPos = {x : j, y: i, z: k};
+                        playerdata = new Player(startPos);
                         break;
                     }
                     if (cell === 'g'){
@@ -105,9 +135,21 @@ $(document).ready(function(){
                     cell = +cell;
 
                     if(cell !== 0){
+                        var texture;
+                        switch (cell){
+                            case 1:
+                                texture = textures.grey;
+                                break;
+                            case 2:
+                                texture = textures.water;
+                                break;
+                            case 3:
+                                texture = textures.fire;
+                                break;
+                        }
                         var pos = new THREE.Vector3(j, i, k);
                         pos.multiplyScalar(cubeSize);
-                        cubes.push(addCube(cubeSize, pos, colours[cell], true));
+                        cubes.push(addCube(cubeSize, pos, false, true, texture));
                     }
                 }
             }
@@ -128,12 +170,12 @@ $(document).ready(function(){
 
         var i;
 
-        checkKeyboard();
-
         tick = tick > 100 ? 1 : tick + 1;
-        fps = Math.round(1000 / (time - oldTime));
+        //fps = Math.round(1000 / (time - oldTime));
         oldTime = time;
 
+        checkKeyboard();
+        
         var numEntities = animalscubes.length + 1;
         for (i = 0; i < numEntities; i++) {
             var entity, data;
@@ -157,11 +199,12 @@ $(document).ready(function(){
                 //This should be replaced with vector1.equals(vector2) if
                 //the method appears. Couldn't find it in Chrome.
                 if (playerdata.arrayPosition.distanceTo(data.arrayPosition) === 0){
-                    console.log("absorb");
-                    scene.remove(entity);
+                    //console.log("absorb");
+                    //scene.remove(entity);
                     //animalscubes.splice(i);
                     //animalsdata.splice(i);
-                    absorbed++;
+                    //absorbed++;
+                    die();
                 }
             }
             if (data.distanceToMove > 0){
@@ -174,25 +217,36 @@ $(document).ready(function(){
 
             entity.position = data.position;
         }
+
         moveCamera();
+
 
         //This should be replaced with vector1.equals(vector2) if
         //the method appears. Couldn't find it in Chrome.
         if (playerdata.arrayPosition.distanceTo(goaldata.arrayPosition) === 0){
             levelFinished = true;
-            if (currentLevel < numLevels){
-                
-            } else {
-                alert("You've finished the game");
-            }
         }
 
         //These don't need updating every frame
-        if (tick % 20 === 0){
-            DOM.fps.text(fps + " FPS");
-            GUI.setAbsorbed();
-        }
+        // if (tick % 20 === 0){
+        //     DOM.fps.text(fps + " FPS");
+        //     GUI.setAbsorbed();
+        // }
         
+    };
+
+    var die = function(){
+        paused = true;
+        window.clearInterval(timer);
+        previousTimes.push(+timeString);
+        var best = Math.max.apply(Math, previousTimes);
+        var message = "Game Over" +
+            "<br>You survived for " + timeString + " seconds" +
+            "<br>Your best time is " + best + " seconds" +
+            "<br>Press enter to restart";
+        DOM.message.html(message);
+        DOM.overlay.show();
+        died = true;
     };
 
     canMove = function(thing, axis, direction){
@@ -218,7 +272,15 @@ $(document).ready(function(){
             return false;
         }
 
-        //Check whether the block is empty
+        //Detect collisions with other entities
+        // for (var i = 0; i < animalsdata.length; i++) {
+        //     var pos = animalsdata[i].arrayPosition;
+        //     if(pos.distanceTo(p) === 0){
+        //         return false;
+        //     }
+        // }
+
+        //Detect collisions with the world
         var cell = world[q.y][q.x].charAt(q.z);
         if(empty.indexOf(cell) !== -1){
             return true;
@@ -236,6 +298,19 @@ $(document).ready(function(){
             thing.distanceToMove = cubeSize;
             thing.axis = axis;
             thing.direction = direction;
+            var a= thing.arrayPosition;
+            if (a.y > 0 && dangerous.indexOf(world[a.y - 1][a.x][a.z]) !== -1){
+                //The entity is on a block that causes death, like fire or spikes
+                console.log("dead");
+                if (thing === playerdata){
+                    die();
+                    return;
+                }
+                var index = animalsdata.indexOf(thing);
+                if (index !== -1){
+                    scene.remove(animalscubes[index]);
+                }
+            }
         }
     };
 
@@ -245,6 +320,8 @@ $(document).ready(function(){
     };
 
     var init = function(){
+        //Things that only happen once, when the page loads happen here
+        //If it happens any other time, put it in an external function and call it here.
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100 * cubeSize);
@@ -265,11 +342,12 @@ $(document).ready(function(){
         //ray = new THREE.Ray( camera.position );
 
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth - 300, window.innerHeight - 50);
+        var border = 20;
+        renderer.setSize(window.innerWidth - border, window.innerHeight - border);
         renderer.shadowMapEnabled = true;
 
         DOM.game.append(renderer.domElement);
-        GUI.setAbsorbed();
+        //GUI.setAbsorbed();
 
         $('canvas').css({background : 'skyblue'});
 
@@ -296,9 +374,20 @@ $(document).ready(function(){
 
     };
 
-    var addCube = function(size, position, colour, shadows){
+    var addCube = function(size, position, colour, shadows, texture){
         geometry = new THREE.CubeGeometry(size, size, size);
-        material = new THREE.MeshLambertMaterial({color: colour});
+        
+        var args = {
+            shading: THREE.SmoothShading
+        };
+        if (colour) { args.color = colour; }
+        if (texture) {
+            texture.minFilter = THREE.NearestFilter;
+            texture.magFilter = THREE.NearestFilter;
+            args.map = texture;
+        }
+
+        material = new THREE.MeshLambertMaterial(args);
 
         mesh = new THREE.Mesh(geometry, material);
 

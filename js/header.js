@@ -19,8 +19,9 @@ var world = [],
 
 var rand, randbool, randColour;
 
-var paused = false,
-    flying = false;
+var paused = true,
+    flying = false,
+    begun = false;
     
 var colours = [
     null,
@@ -29,6 +30,23 @@ var colours = [
     0x0D4FBF, //water blue
     0x5C3C06 //mud brown
 ];
+
+var texPath = "images/textures/";
+var textures = {
+    grey: THREE.ImageUtils.loadTexture(texPath + "grey.png"),
+    player: THREE.ImageUtils.loadTexture(texPath + "player.png"),
+    water: THREE.ImageUtils.loadTexture(texPath + "water.png"),
+    fire: THREE.ImageUtils.loadTexture(texPath + "fire.png")
+};
+
+var DOM;
+var died = false;
+var startPos;
+
+var timer,
+    previousTimes = [],
+    startTimer,
+    timeString;
 
 var animalscubes = [],
     animalsdata = [],

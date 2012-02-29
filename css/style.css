@@ -92,21 +92,66 @@ body{
 	float: left;
 }
 
-#ui{
+#info{
 	width: 280px;
 	padding: 20px;
-	border: 1px solid black;
 }
 
-#ui div{
+#info div{
 	margin: 0 20px 0 0;
-	border-bottom: 1px solid black;
+	border-bottom: 1px solid white;
 	padding: 5px;
+}
+
+#wrap{
+	position: relative;
+}
+
+#timer{
+	position: absolute;
+	font-size: 50px;
+	top: 30px;
+	color: black;
+	font-weight: bold;
+	left: 50%;
+}
+
+#overlay{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: black;
+	color: white;
+	padding: 20px;
+	
+	
+	line-height: 35px;
+}
+
+#message{
+	font-size: 30px;
+	text-align: center;
+}
+
+#info{
+
+}
+
+.fps{
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#overlay div{
+	float: left;
 }
 
 .round{
 	-moz-border-radius: 10px;
-	-webkit-border-radius: 1opx;
+	-webkit-border-radius: 10px;
 	border-radius: 10px;
 }
 

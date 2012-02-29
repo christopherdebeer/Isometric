@@ -35,8 +35,31 @@ var bindInputs = function(){
     $.getJSON('settings.json', function(data){
         settings = data;
 
-        key(data.keyboard.misc.pause, function(){ paused = !paused; });
+        key(data.keyboard.misc.pause, function(){
+            if (died) { return; }
+            paused = !paused;
+            DOM.message.html("<h1>Game Paused</h1>");
+            DOM.overlay.toggle();
+        });
         key(data.keyboard.fly, function(){ flying = !flying; });
         key(data.keyboard.misc.mute, function(){ music.muted = !music.muted; });
+        key(data.keyboard.misc.restart, function(){
+            if (!begun){
+                DOM.overlay.hide();
+                DOM.overlay.css({"background" : "rgba(0,0,0,.8)"});
+                DOM.splash.html("");
+                paused = false;
+                begun = true;
+            } else {
+                if (!died) { return; }
+                died = false;
+                DOM.overlay.hide();
+                playerdata = new Player(startPos);
+                startTimer();
+                paused = false;
+            }
+        });
+
+        //key('r', function(){ playerdata.position = new THREE.Vector3(0, 0, 0); });
     });
 };

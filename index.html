@@ -6,10 +6,13 @@
     <meta charset="utf-8" />
 	<link rel="stylesheet" href="css/style.css">
 
+	<!-- Third Party -->
 	<script src="js/jquery.js"></script>
 	<script src="js/Three.js"></script>
 	<script src="js/keyboard.js"></script>
+	<script src="js/stats.js"></script>
 
+	<!-- Original -->
 	<script src="js/header.js"></script>
 	<script src="js/entities.js"></script>
 
@@ -17,7 +20,6 @@
 
 	<script src="js/input.js"></script>
 	
-
 	<link href="images/favicon.ico" rel="shortcut icon">
 	<title>Isometric</title>
 </head>
@@ -25,21 +27,32 @@
 <body>
 
 <div class="container">
-    <div id="game"></div>
-	
-	<div id="ui">
-	    <div id="fps"></div>
-	    <div id="absorbed"></div>
-	    <div>
-	    Controls:
-		    <li>WASD to move</li>
-		    <li>Space to jump</li>
-		    <li>F to toggle flying mode</li>
-		    <li>P to pause</li>
-		    <li>M to mute audio</li>
-		    <li>Backslash to move down</li>
-	    </div>
+	<div id="wrap">
+    	<div id="game"></div>
+    	<h1 id="timer"></h1>
+
+    	<div id="overlay">
+    		<div id="info">
+			    <div>
+			    	Controls:
+				    <li>WASD to move</li>
+				    <li>Space to jump</li>
+				    <li>F to toggle flying mode</li>
+				    <li>P to pause</li>
+				    <li>M to mute audio</li>
+				    <li>Backslash to move down</li>
+			    </div>
+    		</div>
+    		<div id="splash">
+    			<img src="images/splash.png">
+    		</div>
+    		<div id="message">
+    			<h1>Press enter to begin</h1>
+    		</div>		
+    	</div>
     </div>
+	
+	
 </div>
 
 </body>
