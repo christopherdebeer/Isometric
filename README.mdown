@@ -46,3 +46,4 @@ Libraries / third party code used:
 - [keymaster.js](https://github.com/madrobby/keymaster)
 - [THREEx.KeyboardState](http://learningthreejs.com/blog/2011/09/12/lets-Make-a-3D-game-keyboard/)
 - [Voxels Demo](http://mrdoob.com/129/Voxels) by [mrdoob](https://github.com/mrdoob) for the level editor.
+- [stats.js](https://github.com/mrdoob/stats.js)

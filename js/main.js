@@ -11,12 +11,11 @@ $(document).ready(function(){
 
     //var mouse, projector, ray, floor;
 
-    var fps,
-        oldTime = +new Date(),
+    var oldTime = +new Date(),
         tick = 1;
 
     DOM = {
-        fps: $("#fps"),
+        //fps: $("#fps"),
         //absorbed: $("#absorbed"),
         game: $("#game"),
         overlay: $("#overlay"),
@@ -38,6 +37,11 @@ $(document).ready(function(){
     };
 
     var muted = true; //false for production
+
+    var stats = new Stats(),
+        fpsCounter = $(stats.getDomElement()).addClass('fps');
+    $('body').append(fpsCounter);
+    window.setInterval(function(){ stats.update(); }, 1000 / 60);
 
     startTimer = function(){
         secs = 0;
@@ -166,9 +170,8 @@ $(document).ready(function(){
 
         var i;
 
-
         tick = tick > 100 ? 1 : tick + 1;
-        fps = Math.round(1000 / (time - oldTime));
+        //fps = Math.round(1000 / (time - oldTime));
         oldTime = time;
 
         checkKeyboard();
@@ -225,10 +228,10 @@ $(document).ready(function(){
         }
 
         //These don't need updating every frame
-        if (tick % 20 === 0){
-            DOM.fps.text(fps + " FPS");
-            //GUI.setAbsorbed();
-        }
+        // if (tick % 20 === 0){
+        //     DOM.fps.text(fps + " FPS");
+        //     GUI.setAbsorbed();
+        // }
         
     };
 

@@ -139,6 +139,12 @@ body{
 
 }
 
+.fps{
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
 #overlay div{
 	float: left;
 }
