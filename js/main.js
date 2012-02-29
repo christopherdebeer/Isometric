@@ -21,7 +21,7 @@ $(document).ready(function(){
         DOM[id] = $('#' + id);
     }
 
-    var empty = "02gp", //blocks that can be moved through
+    var empty = "02gpa", //blocks that can be moved through
         dangerous = "3"; //blocks that cause death
 
     var secs = 0,
@@ -82,9 +82,10 @@ $(document).ready(function(){
         animalscubes = [];
         animalsdata = [];
         cubes = [];
+        animalsAreDefinedInLevelFile = false;
 
-        playerdata = new Player({x : 0, y: 0, z: 0});
-        goaldata = new Goal({x : 0, y: 0, z: 0});
+        playerdata = new Player(0, 0, 0);
+        goaldata = new Goal(0, 0, 0);
         $.getJSON('worlds/' + currentLevel + '.json', function(data){
             world = data.world;
 
@@ -96,12 +97,17 @@ $(document).ready(function(){
             
             moveCamera();
 
-            for (var i = 0; i < numAnimals; i++) {
-                var a = new Animal(dimensions);
-                animalsdata.push(a);
-                animalscubes.push(addCube(a.height, a.position, a.colour, true));
+            if (!animalsAreDefinedInLevelFile){
+                for (var i = 0; i < numAnimals; i++) {
+                    var a = new Animal(
+                        THREE.Math.randInt(2, dimensions.x - 3),
+                        1,
+                        THREE.Math.randInt(2, dimensions.z - 3)
+                    );
+                    animalsdata.push(a);
+                    animalscubes.push(addCube(a.height, a.position, a.colour, true));
+                }
             }
-
             loadMusic();
         });
         startTimer();
@@ -118,33 +124,38 @@ $(document).ready(function(){
             for (j = 0; j < layer.length; j++) {
                 line = layer[j].split('');
 
+                cellsLoop:
                 for (k = 0; k < line.length; k++) {
                     cell = line[k];
-
-                    if (cell === 'p'){
-                        startPos = {x : j, y: i, z: k};
-                        playerdata = new Player(startPos);
-                        break;
+                    var texture = false;
+                    switch (cell){
+                        case '0':
+                            break;
+                        case 'p':
+                            startPos = {x : j, y: i, z: k};
+                            playerdata = new Player(j, i, k);
+                            break;
+                        case 'g':
+                            goaldata = new Goal(j, i, k);
+                            break;
+                        case 'a':
+                            animalsAreDefinedInLevelFile = true;
+                            var a = new Animal(j, i, k);
+                            animalsdata.push(a);
+                            animalscubes.push(addCube(a.height, a.position, a.colour, true));
+                            break;
+                        case '1':
+                            texture = textures.grey;
+                            break;
+                        case '2':
+                            texture = textures.water;
+                            break;
+                        case '3':
+                            texture = textures.fire;
+                            break;
                     }
-                    if (cell === 'g'){
-                        goaldata = new Goal({x : j, y: i, z: k});
-                        break;
-                    }
-                    cell = +cell;
 
-                    if(cell !== 0){
-                        var texture;
-                        switch (cell){
-                            case 1:
-                                texture = textures.grey;
-                                break;
-                            case 2:
-                                texture = textures.water;
-                                break;
-                            case 3:
-                                texture = textures.fire;
-                                break;
-                        }
+                    if(texture){
                         var pos = new THREE.Vector3(j, i, k);
                         pos.multiplyScalar(cubeSize);
                         cubes.push(addCube(cubeSize, pos, false, true, texture));
@@ -378,10 +389,10 @@ $(document).ready(function(){
         var args = {
             shading: THREE.SmoothShading
         };
-        if (colour) { args.color = colour; }
+        if (colour) {
+            args.color = colour;
+        }
         if (texture) {
-            texture.minFilter = THREE.NearestFilter;
-            texture.magFilter = THREE.NearestFilter;
             args.map = texture;
         }
 

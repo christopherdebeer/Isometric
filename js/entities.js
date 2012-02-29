@@ -26,8 +26,8 @@ Player.prototype.constructor = Player;
 Animal.prototype = new Entity();
 Animal.prototype.constructor = Animal;
 
-function Player(p){
-    this.arrayPosition = new THREE.Vector3(p.x, p.y, p.z);
+function Player(x, y, z){
+    this.arrayPosition = new THREE.Vector3(x, y, z);
     this.position = new THREE.Vector3();
     
     this.position.addSelf(this.arrayPosition);
@@ -36,12 +36,8 @@ function Player(p){
     this.texture = textures.player;
 }
 
-function Animal(d){
-    this.arrayPosition = new THREE.Vector3(
-        THREE.Math.randInt(2, d.x - 3),
-        1,
-        THREE.Math.randInt(2, d.z - 3)
-    );
+function Animal(x, y, z){
+    this.arrayPosition = new THREE.Vector3(x, y, z);
 
     this.position = new THREE.Vector3();
     this.position.addSelf(this.arrayPosition);
@@ -52,8 +48,8 @@ function Animal(d){
     this.width = cubeSize;
 }
 
-var Goal = function(p){
-    this.arrayPosition = new THREE.Vector3(p.x, p.y, p.z);
+var Goal = function(x, y, z){
+    this.arrayPosition = new THREE.Vector3(x, y, z);
     this.position = new THREE.Vector3();
     this.position.addSelf(this.arrayPosition);
     this.position.multiplyScalar(cubeSize);

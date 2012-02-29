@@ -54,7 +54,7 @@ var bindInputs = function(){
                 if (!died) { return; }
                 died = false;
                 DOM.overlay.hide();
-                playerdata = new Player(startPos);
+                playerdata = new Player(startPos.x, startPos.y, startPos.z);
                 startTimer();
                 paused = false;
             }

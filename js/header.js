@@ -36,12 +36,17 @@ var texPath = "images/textures/",
     textures = {};
 for (var i = 0; i < texFiles.length; i++) {
     var file = texFiles[i];
-    textures[file] = THREE.ImageUtils.loadTexture(texPath + file + '.png');
+    var tex = THREE.ImageUtils.loadTexture(texPath + file + '.png');
+    tex.minFilter = THREE.NearestFilter;
+    tex.magFilter = THREE.NearestFilter;
+    textures[file] = tex;
 }
 
 var DOM;
 var died = false;
 var startPos;
+
+var animalsAreDefinedInLevelFile;
 
 var timer,
     previousTimes = [],
