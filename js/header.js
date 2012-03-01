@@ -46,7 +46,7 @@ var DOM;
 var died = false;
 var startPos;
 
-var animalsAreDefinedInLevelFile;
+var numberOfRandomlyPositionedAnimals;
 
 var timer,
     previousTimes = [],

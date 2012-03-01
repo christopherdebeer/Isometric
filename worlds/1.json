@@ -1,4 +1,7 @@
 {
+	
+	"numberOfRandomlyPositionedAnimals" : 5,
+
 	"world" : [
 		[
 			"00000000000000000000",

@@ -21,7 +21,7 @@ $(document).ready(function(){
         DOM[id] = $('#' + id);
     }
 
-    var empty = "02gpa", //blocks that can be moved through
+    var empty = "023gpa", //blocks that can be moved through
         dangerous = "3"; //blocks that cause death
 
     var secs = 0,
@@ -89,6 +89,11 @@ $(document).ready(function(){
         $.getJSON('worlds/' + currentLevel + '.json', function(data){
             world = data.world;
 
+            //if you want randomly generated animals specify how many in this property of the level file
+            //you can have a mix of random and level-defined ones, both or neither.
+            numberOfRandomlyPositionedAnimals = data.numberOfRandomlyPositionedAnimals || 0;
+            console.log(numberOfRandomlyPositionedAnimals);
+
             dimensions.y = world.length;
             parseWorld();
 
@@ -97,18 +102,18 @@ $(document).ready(function(){
             
             moveCamera();
 
-            if (!animalsAreDefinedInLevelFile){
-                for (var i = 0; i < numAnimals; i++) {
-                    var a = new Animal(
-                        THREE.Math.randInt(2, dimensions.x - 3),
-                        1,
-                        THREE.Math.randInt(2, dimensions.z - 3)
-                    );
-                    animalsdata.push(a);
-                    animalscubes.push(addCube(a.height, a.position, a.colour, true));
-                }
+            for (var i = 0; i < numberOfRandomlyPositionedAnimals; i++) {
+                var a = new Animal(
+                    THREE.Math.randInt(2, dimensions.x - 3),
+                    1,
+                    THREE.Math.randInt(2, dimensions.z - 3)
+                );
+                animalsdata.push(a);
+                animalscubes.push(addCube(a.height, a.position, a.colour, true));
             }
+
             loadMusic();
+            
         });
         startTimer();
     };
@@ -224,6 +229,17 @@ $(document).ready(function(){
                 data.isAnimating = false;
             }
 
+            var a = data.arrayPosition;
+            if (dangerous.indexOf(world[a.y][a.x][a.z]) !== -1){
+                //The entity is on a block that causes death, like fire or spikes
+                console.log("dead");
+                if (data === playerdata){
+                    die();
+                } else {
+                    scene.remove(entity);
+                }
+            }
+
             entity.position = data.position;
         }
 
@@ -238,8 +254,7 @@ $(document).ready(function(){
 
         //These don't need updating every frame
         // if (tick % 20 === 0){
-        //     DOM.fps.text(fps + " FPS");
-        //     GUI.setAbsorbed();
+
         // }
         
     };
@@ -282,12 +297,12 @@ $(document).ready(function(){
         }
 
         //Detect collisions with other entities
-        // for (var i = 0; i < animalsdata.length; i++) {
-        //     var pos = animalsdata[i].arrayPosition;
-        //     if(pos.distanceTo(p) === 0){
-        //         return false;
-        //     }
-        // }
+        for (var i = 0; i < animalsdata.length; i++) {
+            var pos = animalsdata[i].arrayPosition;
+            if (q.x === pos.x && q.z == pos.y && q.y === pos.z){
+                return false;
+            }
+        }
 
         //Detect collisions with the world
         var cell = world[q.y][q.x].charAt(q.z);
@@ -307,19 +322,6 @@ $(document).ready(function(){
             thing.distanceToMove = cubeSize;
             thing.axis = axis;
             thing.direction = direction;
-            var a= thing.arrayPosition;
-            if (a.y > 0 && dangerous.indexOf(world[a.y - 1][a.x][a.z]) !== -1){
-                //The entity is on a block that causes death, like fire or spikes
-                console.log("dead");
-                if (thing === playerdata){
-                    die();
-                    return;
-                }
-                var index = animalsdata.indexOf(thing);
-                if (index !== -1){
-                    scene.remove(animalscubes[index]);
-                }
-            }
         }
     };
 
@@ -344,7 +346,7 @@ $(document).ready(function(){
         // fog.near = 40;
         // scene.fog = fog;
 
-        createWorld();
+        
 
         //mouse = new THREE.Vector3( 0, 0, 1 );
         //projector = new THREE.Projector();
@@ -362,12 +364,12 @@ $(document).ready(function(){
 
         bindInputs();
 
-        
+        createWorld();
     };
 
     var run = function(time){
         if (levelFinished){
-            alert("You win the current level");
+            console.log("You win the current level");
             currentLevel++;
 
             music.pause();
