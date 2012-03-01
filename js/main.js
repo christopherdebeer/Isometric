@@ -36,6 +36,8 @@ $(document).ready(function(){
 
     var muted = true; //false for production
 
+    var freeSpaces = [];
+
     var stats = new Stats(),
         fpsCounter = $(stats.getDomElement()).addClass('fps');
     $('body').append(fpsCounter);
@@ -102,12 +104,11 @@ $(document).ready(function(){
             
             moveCamera();
 
+            //console.log(freeSpaces);
             for (var i = 0; i < numberOfRandomlyPositionedAnimals; i++) {
-                var a = new Animal(
-                    THREE.Math.randInt(2, dimensions.x - 3),
-                    1,
-                    THREE.Math.randInt(2, dimensions.z - 3)
-                );
+                var pos = freeSpaces[Math.floor(Math.random() * freeSpaces.length)];
+
+                var a = new Animal(pos.x, pos.y, pos.z);
                 animalsdata.push(a);
                 animalscubes.push(addCube(a.height, a.position, a.colour, true));
             }
@@ -135,6 +136,10 @@ $(document).ready(function(){
                     var texture = false;
                     switch (cell){
                         case '0':
+                            if(i > 0 && world[i - 1][j][k] !== '0'){
+                                freeSpaces.push({ x : j, y: i, z: k });
+                            }
+                            
                             break;
                         case 'p':
                             startPos = {x : j, y: i, z: k};
@@ -305,7 +310,7 @@ $(document).ready(function(){
         }
 
         //Detect collisions with the world
-        var cell = world[q.y][q.x].charAt(q.z);
+        var cell = world[q.y][q.x][q.z];
         if(empty.indexOf(cell) !== -1){
             return true;
         }
