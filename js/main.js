@@ -277,7 +277,9 @@ $(document).ready(function(){
         //addLight(0, 0, 0, 'ambient');
         //addLight(-17 * cubeSize, 33 * cubeSize, 16 * cubeSize);
 
-        renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
         var border = 20;
         renderer.setSize(window.innerWidth - border, window.innerHeight - border);
         renderer.shadowMapEnabled = true;
