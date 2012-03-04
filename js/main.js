@@ -357,7 +357,9 @@ $(document).ready(function(){
         //projector = new THREE.Projector();
         //ray = new THREE.Ray( camera.position );
 
-        renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
         var border = 20;
         renderer.setSize(window.innerWidth - border, window.innerHeight - border);
         renderer.shadowMapEnabled = true;
