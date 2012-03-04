@@ -23,25 +23,30 @@ var paused = true,
     flying = false,
     begun = false;
     
-var colours = [
-    null,
-    0x0CA80C, //grass green
-    0x333333, //grey
-    0x0D4FBF, //water blue
-    0x5C3C06 //mud brown
-];
+// var colours = [
+//     null,
+//     0x0CA80C, //grass green
+//     0x333333, //grey
+//     0x0D4FBF, //water blue
+//     0x5C3C06 //mud brown
+// ];
 
-var texPath = "images/textures/";
-var textures = {
-    grey: THREE.ImageUtils.loadTexture(texPath + "grey.png"),
-    player: THREE.ImageUtils.loadTexture(texPath + "player.png"),
-    water: THREE.ImageUtils.loadTexture(texPath + "water.png"),
-    fire: THREE.ImageUtils.loadTexture(texPath + "fire.png")
-};
+var texPath = "images/textures/",
+    texFiles = ['grey', 'player', 'water', 'fire'],
+    textures = {};
+for (var i = 0; i < texFiles.length; i++) {
+    var file = texFiles[i];
+    var tex = THREE.ImageUtils.loadTexture(texPath + file + '.png');
+    tex.minFilter = THREE.NearestFilter;
+    tex.magFilter = THREE.NearestFilter;
+    textures[file] = tex;
+}
 
 var DOM;
 var died = false;
 var startPos;
+
+var numberOfRandomlyPositionedAnimals;
 
 var timer,
     previousTimes = [],

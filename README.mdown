@@ -12,11 +12,9 @@ Planned features
 ###(short-term tasks managed in Issues tab)
 
 - Add block types and detection for when the player is over them
-	- Fire
 	- Ice
 	- Shrink
 	- Spikes
-	- Water
 
 - Upgrades for absorbing cubes
 	- grow in size?
@@ -24,9 +22,9 @@ Planned features
 
 - Level editor
 
-- Textures, not just colours
+- Theme song
 
-- Menu screen and theme song
+- Environment sounds
 
 
 Contributors
