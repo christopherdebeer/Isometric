@@ -2,27 +2,54 @@
 //This can't be the best way to do it, but it works for now.
 //Maybe use some async script loader like require.js?
 
-var pi = Math.PI,
-    tau = 2 * pi,
-    halfpi = pi / 2;
+// var pi = Math.PI,
+//     tau = 2 * pi,
+//     halfpi = pi / 2;
 
-var world = [],
-    currentLevel = 1,
-    numLevels = 3,
-    dimensions = {},
-    
+var world = [], //3d array to hold level data
+    cubes = [], //list of references to each cube that comprisises the world
+    freeSpaces = [], //list of coordinates of 'air' in the world file
+    dimensions = {}, //x y and z size of the world in cubes
+
+    currentLevel = 1, //only for debug, no reason not to start on 1
+    numberOfRandomlyPositionedAnimals = 0,
     cubeSize = 10,
     fov = 70,
 
-    numAnimals = 10,
-    absorbed = 0;
+    DOM,
+    startPos,
 
-var rand, randbool, randColour;
-
-var paused = true,
+    paused = true,
     flying = false,
-    begun = false;
-    
+    begun = false,
+    died = false,
+    muted = true, //false for production
+    levelFinished = false,
+
+    empty = "023gpa", //blocks that can be moved through
+    dangerous = "3"; //blocks that cause death
+
+
+
+var Random = function(scale){
+    scale = scale || 1;
+    return Math.random() * scale;
+};
+
+Random.bool = function(x){
+    x = x || 0.5;
+    return Math.random() > x;
+};
+
+Random.colour = function(){
+    return Math.floor(Math.random() * 16777215);
+};
+
+Random.arr = function(arr, len){
+    len = len || arr.length;
+    return arr[Math.floor(Math.random() * len)];
+};
+
 // var colours = [
 //     null,
 //     0x0CA80C, //grass green
@@ -42,12 +69,6 @@ for (var i = 0; i < texFiles.length; i++) {
     textures[file] = tex;
 }
 
-var DOM;
-var died = false;
-var startPos;
-
-var numberOfRandomlyPositionedAnimals;
-
 var timer,
     previousTimes = [],
     startTimer,
@@ -61,8 +82,6 @@ var animalscubes = [],
 
     playerdata,
     goaldata;
-
-var updatePos, canMove;
 
 var keyboard = new THREEx.KeyboardState(),
     settings,

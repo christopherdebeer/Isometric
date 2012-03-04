@@ -5,11 +5,7 @@ $(document).ready(function(){
 
     var camera, scene, renderer,
         geometry, material,
-        levelFinished = false,
-        cubes = [],
         cameraOffset = new THREE.Vector3(4, 6, 7).multiplyScalar(cubeSize);
-
-    //var mouse, projector, ray, floor;
 
     var oldTime = +new Date(),
         tick = 1;
@@ -21,22 +17,8 @@ $(document).ready(function(){
         DOM[id] = $('#' + id);
     }
 
-    var empty = "023gpa", //blocks that can be moved through
-        dangerous = "3"; //blocks that cause death
-
     var secs = 0,
         hundredths = 0;
-
-    var GUI = {
-        // setAbsorbed: function(){
-        //     var plural = absorbed === 1 ? '' : 's';
-        //     DOM.absorbed.text(absorbed + " other cube" + plural + " absorbed");
-        // }
-    };
-
-    var muted = true; //false for production
-
-    var freeSpaces = [];
 
     var stats = new Stats(),
         fpsCounter = $(stats.getDomElement()).addClass('fps');
@@ -105,8 +87,8 @@ $(document).ready(function(){
             moveCamera();
 
             //console.log(freeSpaces);
-            for (var i = 0; i < numberOfRandomlyPositionedAnimals; i++) {
-                var pos = freeSpaces[Math.floor(Math.random() * freeSpaces.length)];
+            for (var i = 0; i < numberOfRandomlyPositionedAnimals; i++){
+                var pos = Random.arr(freeSpaces);
 
                 var a = new Animal(pos.x, pos.y, pos.z);
                 animalsdata.push(a);
@@ -203,17 +185,17 @@ $(document).ready(function(){
                 data = playerdata;
 
                 if(!flying){
-                    updatePos(playerdata, 'y', -1);
+                    playerdata.updatePos('y', -1);
                 }
             } else {
                 entity = animalscubes[i];
                 data = animalsdata[i];
 
-                var axis = randbool() ? 'z' : 'x',
-                    dir = randbool() ? 1 : -1;
+                var axis = Random.bool() ? 'z' : 'x',
+                    dir = Random.bool() ? 1 : -1;
 
-                updatePos(data, axis, dir);
-                updatePos(data, 'y', -1);
+                data.updatePos(axis, dir);
+                data.updatePos('y', -1);
 
                 //This should be replaced with vector1.equals(vector2) if
                 //the method appears. Couldn't find it in Chrome.
@@ -278,58 +260,6 @@ $(document).ready(function(){
         died = true;
     };
 
-    canMove = function(thing, axis, direction){
-        //Calculate the place the cube would be if it moved,
-        //return true if that place is available
-
-        var p, q;
-        p = thing.arrayPosition;
-
-        // if (axis === 'y' && direction === -1 && p.y === 0){
-        //     return true; //Allow blocks to fall below the bottom of the world
-        // }
-
-        q = {x: p.x, y: p.y, z: p.z};
-        q[axis] += direction;
-        
-        //Check that the cube is within the bounds of the world
-        if (
-            q.x < 0 || q.x >= dimensions.x ||
-            q.z < 0 || q.z >= dimensions.z ||
-            q.y < 0 || q.y >= dimensions.y
-        ){
-            return false;
-        }
-
-        //Detect collisions with other entities
-        for (var i = 0; i < animalsdata.length; i++) {
-            var pos = animalsdata[i].arrayPosition;
-            if (q.x === pos.x && q.z == pos.y && q.y === pos.z){
-                return false;
-            }
-        }
-
-        //Detect collisions with the world
-        var cell = world[q.y][q.x][q.z];
-        if(empty.indexOf(cell) !== -1){
-            return true;
-        }
-        //console.log('hit');
-    };
-
-    updatePos = function(thing, axis, direction){
-        //Don't try to move it again if its currently in the process of moving
-        if (thing.isAnimating){ return; }
-
-        if (canMove(thing, axis, direction)){
-            thing.isAnimating = true;
-            thing.arrayPosition[axis] += direction;
-            thing.distanceToMove = cubeSize;
-            thing.axis = axis;
-            thing.direction = direction;
-        }
-    };
-
     var moveCamera = function(){
         camera.position = cameraOffset.clone().addSelf(playerdata.position);
         camera.lookAt(playerdata.position);
@@ -344,18 +274,8 @@ $(document).ready(function(){
         scene.add(camera);
 
         addLight(17 * cubeSize, 33 * cubeSize, -16 * cubeSize);
-        addLight(-17 * cubeSize, 33 * cubeSize, 16 * cubeSize);
-
-        // var fog = new THREE.Fog();
-        // fog.color = 0x444444;
-        // fog.near = 40;
-        // scene.fog = fog;
-
-        
-
-        //mouse = new THREE.Vector3( 0, 0, 1 );
-        //projector = new THREE.Projector();
-        //ray = new THREE.Ray( camera.position );
+        //addLight(0, 0, 0, 'ambient');
+        //addLight(-17 * cubeSize, 33 * cubeSize, 16 * cubeSize);
 
         renderer = new THREE.WebGLRenderer();
         var border = 20;
@@ -409,6 +329,7 @@ $(document).ready(function(){
 
         mesh.castShadow = shadows;
         mesh.receiveShadow = true;
+        //mesh.overdraw = true;
 
         mesh.position.addSelf(position);
         
@@ -417,10 +338,20 @@ $(document).ready(function(){
         return mesh;
     };
 
-    var addLight = function(x, y, z){
-        var light = new THREE.DirectionalLight(0xffffff, 0.5);
-        light.position.set(x, y, z);
-        light.castShadow = true;
+    var addLight = function(x, y, z, type){
+        type = type || 'directional';
+        var light;
+        switch(type){
+            case 'directional':
+                light = new THREE.DirectionalLight(0xffffff, 0.5);
+                light.position.set(x, y, z);
+                light.castShadow = true;
+                break;
+            case 'ambient':
+                light = new THREE.AmbientLight();
+                break;
+        }
+        
         scene.add(light);
         return light;
     };
